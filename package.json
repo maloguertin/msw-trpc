@@ -1,0 +1,25 @@
+{
+  "name": "msw-trpc",
+  "version": "1.0.0",
+  "description": "Trpc API for Mock Service Worker (MSW).",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maloguertin/msw-trpc.git"
+  },
+  "keywords": [
+    "msw",
+    "trpc",
+    "testing",
+    "api"
+  ],
+  "author": "Malo Guertin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maloguertin/msw-trpc/issues"
+  },
+  "homepage": "https://github.com/maloguertin/msw-trpc#readme"
+}

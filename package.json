@@ -2,7 +2,7 @@
   "name": "msw-trpc",
   "version": "1.0.0",
   "description": "Trpc API for Mock Service Worker (MSW).",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "tsc --noEmit && jest",
     "build": "rimraf dist && tsc -p tsconfig.build.json"
@@ -18,7 +18,7 @@
     "api"
   ],
   "author": "Malo Guertin",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/maloguertin/msw-trpc/issues"
   },

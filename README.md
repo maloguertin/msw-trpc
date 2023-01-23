@@ -26,7 +26,7 @@ As someone who loves MSW and was already using it I wanted to keep using it inst
 npm i msw-trpc --save-dev
 ```
 
-**2. build your tpcMsw with createTRPCMsw.**
+**2. build your trpcMsw with createTRPCMsw.**
 
 ```typescript
 import { createTRPCMsw } from '@trpc/server'

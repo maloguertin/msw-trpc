@@ -1,4 +1,4 @@
-import { AnyRouter, BuildProcedure, defaultTransformer, ProcedureParams } from '@trpc/server'
+import { AnyRouter, BuildProcedure, CombinedDataTransformer, defaultTransformer, ProcedureParams } from '@trpc/server'
 import {
   DefaultBodyType,
   MockedRequest,
@@ -18,7 +18,11 @@ const getQueryInput = (req: RestRequest) => {
   return JSON.parse(inputString)
 }
 
-const createTRPCMsw = <Router extends AnyRouter>({ baseUrl = 'trpc', transformer = defaultTransformer } = {}) => {
+const createTRPCMsw = <Router extends AnyRouter>({
+  baseUrl,
+  basePath = 'trpc',
+  transformer = defaultTransformer,
+}: { baseUrl?: string; basePath?: string; transformer?: CombinedDataTransformer } = {}) => {
   type ExtractKeys<T extends Router, K extends keyof T = keyof T> = T[K] extends
     | BuildProcedure<'query', any, any>
     | BuildProcedure<'mutation', any, any>
@@ -84,10 +88,12 @@ const createTRPCMsw = <Router extends AnyRouter>({ baseUrl = 'trpc', transformer
 
         const procedure = {} as QueryAndMutation<Router, keyof Router>
 
-        const pathRegexp = new RegExp(`\/${baseUrl}\/${procedureKey as string}`)
+        const path = baseUrl
+          ? `${baseUrl}/${procedureKey as string}`
+          : new RegExp(`\/${basePath}\/${procedureKey as string}`)
 
         procedure.query = handler =>
-          rest.get(pathRegexp, (req, res, ctx) => {
+          rest.get(path, (req, res, ctx) => {
             // @ts-expect-error any
             return handler({ ...req, getInput: () => getQueryInput(req) }, res, {
               ...ctx,
@@ -96,7 +102,7 @@ const createTRPCMsw = <Router extends AnyRouter>({ baseUrl = 'trpc', transformer
           })
 
         procedure.mutation = handler =>
-          rest.post(pathRegexp, (req, res, ctx) => {
+          rest.post(path, (req, res, ctx) => {
             // @ts-expect-error any
             return handler(req, res, {
               ...ctx,

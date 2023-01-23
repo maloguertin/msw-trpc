@@ -43,7 +43,7 @@ const appRouter = t.router({
       } as User
     }),
 })
-type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter
 
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
@@ -57,4 +57,5 @@ export const trpc = createTRPCProxyClient<AppRouter>({
     }),
   ],
 })
+
 export const mswTrpc = createTRPCMsw<AppRouter>()

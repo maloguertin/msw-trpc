@@ -1,9 +1,11 @@
 {
   "name": "msw-trpc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Trpc API for Mock Service Worker (MSW).",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "prepublish": "npm run build",
     "test": "tsc --noEmit && jest",
     "build": "rimraf dist && tsc -p tsconfig.build.json"
   },

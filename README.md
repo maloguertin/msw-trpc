@@ -29,7 +29,7 @@ npm i msw-trpc --save-dev
 **2. build your trpcMsw with createTRPCMsw.**
 
 ```typescript
-import { createTRPCMsw } from '@trpc/server'
+import { createTRPCMsw } from 'msw-trpc'
 import type { AppRouter } from 'path/to/your/router'
 
 export const trpcMsw = createTRPCMsw<AppRouter>() /* 👈 */

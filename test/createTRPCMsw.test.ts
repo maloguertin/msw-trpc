@@ -1,0 +1,40 @@
+import { expectTypeOf } from 'expect-type'
+import {
+  ResponseResolver,
+  RestRequest,
+  PathParams,
+  DefaultBodyType,
+  RestHandler,
+  MockedRequest,
+  RestContext,
+} from 'msw'
+import { mswTrpc, User } from './setup'
+
+describe('proxy returned by createMswTrpc', () => {
+  it('should expose property query on properties that match TRPC query procedures', () => {
+    expectTypeOf(mswTrpc.userById.query).toEqualTypeOf<
+      (
+        handler: ResponseResolver<
+          RestRequest<never, PathParams<string>> & { getInput: () => string },
+          RestContext & {
+            data: (data: User | undefined) => any
+          },
+          DefaultBodyType
+        >
+      ) => RestHandler<MockedRequest<DefaultBodyType>>
+    >()
+  })
+
+  it('should expose property mutation on properties that match TRPC mutation procedures', () => {
+    expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
+      (
+        handler: ResponseResolver<
+          RestRequest<string, PathParams>,
+          RestContext & {
+            data: (data: User) => any
+          }
+        >
+      ) => RestHandler<MockedRequest<DefaultBodyType>>
+    >()
+  })
+})

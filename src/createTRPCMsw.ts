@@ -1,3 +1,4 @@
+import { AnyRouter, BuildProcedure, defaultTransformer, ProcedureParams } from '@trpc/server'
 import {
   DefaultBodyType,
   MockedRequest,
@@ -9,9 +10,7 @@ import {
   RestRequest,
 } from 'msw'
 
-const transformBody = (data: any) => ({ result: { data } })
-
-const getInput = (req: RestRequest) => {
+const getQueryInput = (req: RestRequest) => {
   const inputString = req.url.searchParams.get('input')
 
   if (inputString === null) return {}
@@ -19,79 +18,57 @@ const getInput = (req: RestRequest) => {
   return JSON.parse(inputString)
 }
 
-const createTRPCMsw = <Trpc>(trpc: Trpc, { baseUrl } = { baseUrl: 'trpc' }) => {
-  type ExtractKeys<T extends Trpc, K extends keyof T = keyof T> = T[K] extends { useQuery: any } | { useMutation: any }
+const createTRPCMsw = <Router extends AnyRouter>({ baseUrl = 'trpc', transformer = defaultTransformer } = {}) => {
+  type ExtractKeys<T extends Router, K extends keyof T = keyof T> = T[K] extends
+    | BuildProcedure<'query', any, any>
+    | BuildProcedure<'mutation', any, any>
     ? K
     : never
 
-  type ExtractQuery<T extends Trpc, K extends keyof T = keyof T> = T[K] extends {
-    useQuery: (...args: any) => infer D
-  }
-    ? D extends { data: any }
-      ? T[K]
-      : never
-    : never
+  type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<any, any, any, infer P> ? P : never
 
-  type ExtractMutation<T extends Trpc, K extends keyof T = keyof T> = T[K] extends {
-    useMutation: (...args: any) => any
-  }
-    ? T[K]
-    : never
-
-  type WithQueryInput<T extends Trpc, K extends keyof T = keyof T> = {
-    getInput: () => Parameters<ExtractQuery<T, K>['useQuery']>[0]
+  type WithInput<T extends Router, K extends keyof T = keyof T> = {
+    getInput: () => T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : never
   }
 
-  type WithMutationInput<T extends Trpc, K extends keyof T = keyof T> = {
-    getInput: () => Parameters<ExtractMutation<T, K>['useMutation']>[0]
+  type ContextWithDataTransformer<T extends Router, K extends keyof T = keyof T> = RestContext & {
+    data: (data: T[K] extends BuildProcedure<any, any, infer P> ? P : never) => any
   }
 
-  type ContextWithQueryDataTransformer<T extends Trpc, K extends keyof T = keyof T> = RestContext & {
-    data: (data: ReturnType<ExtractQuery<T, K>['useQuery']>) => any
-  }
-
-  type ContextWithMutationDataTransformer<T extends Trpc, K extends keyof T = keyof T> = RestContext & {
-    data: (data: ReturnType<ExtractMutation<T, K>['useMutation']>) => any
-  }
-
-  type SetQueryHandler<T extends Trpc, K extends keyof T> = (
+  type SetQueryHandler<T extends Router, K extends keyof T> = (
     handler: ResponseResolver<
-      RestRequest<never, PathParams<string>> & WithQueryInput<T, K>,
-      ContextWithQueryDataTransformer<T, K>,
+      RestRequest<never, PathParams<string>> & WithInput<T, K>,
+      ContextWithDataTransformer<T, K>,
       DefaultBodyType
     >
   ) => RestHandler<MockedRequest<DefaultBodyType>>
 
-  type SetMutationHandler<T extends Trpc, K extends keyof T> = (
+  type SetMutationHandler<T extends Router, K extends keyof T> = (
     handler: ResponseResolver<
-      RestRequest<DefaultBodyType, PathParams> & WithMutationInput<T, K>,
-      ContextWithMutationDataTransformer<T, K>
+      //@ts-expect-error DefaultBodyType doesn't handle unknown but it will be resolved at usage time
+      RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams>,
+      ContextWithDataTransformer<T, K>
     >
   ) => RestHandler<MockedRequest<DefaultBodyType>>
 
-  type Query<T extends Trpc, K extends keyof T> = {
+  type Query<T extends Router, K extends keyof T> = {
     query: SetQueryHandler<T, K>
   }
 
-  type Mutation<T extends Trpc, K extends keyof T> = {
+  type Mutation<T extends Router, K extends keyof T> = {
     mutation: SetMutationHandler<T, K>
   }
 
-  type QueryAndMutation<T extends Trpc, K extends keyof T> = Query<T, K> & Mutation<T, K>
+  type QueryAndMutation<T extends Router, K extends keyof T> = Query<T, K> & Mutation<T, K>
 
-  type ExtractProcedureHandler<T extends Trpc, K extends keyof T> = T[K] extends {
-    useMutation: any
-    useQuery: any
-  }
-    ? QueryAndMutation<T, K>
-    : T[K] extends { useMutation: any }
+  type ExtractProcedureHandler<T extends Router, K extends keyof T> = T[K] extends BuildProcedure<'mutation', any, any>
     ? Mutation<T, K>
-    : T[K] extends { useQuery: any }
+    : T[K] extends BuildProcedure<'query', any, any>
     ? Query<T, K>
     : never
 
   type ExtractProcedures = {
-    [key in keyof Trpc as ExtractKeys<Trpc, key>]: ExtractProcedureHandler<Trpc, key>
+    [key in keyof Router as ExtractKeys<Router, key>]: ExtractProcedureHandler<Router, key>
   }
 
   const isProceduresKey = (key: keyof ExtractProcedures | string | symbol): key is keyof ExtractProcedures => {
@@ -105,23 +82,25 @@ const createTRPCMsw = <Trpc>(trpc: Trpc, { baseUrl } = { baseUrl: 'trpc' }) => {
       get(_target: unknown, procedureKey: keyof ExtractProcedures | string | symbol) {
         if (!isProceduresKey(procedureKey)) return
 
-        const procedure = {} as QueryAndMutation<Trpc, keyof Trpc>
+        const procedure = {} as QueryAndMutation<Router, keyof Router>
+
+        const pathRegexp = new RegExp(`\/${baseUrl}\/${procedureKey as string}`)
 
         procedure.query = handler =>
-          rest.get(`${baseUrl}/${procedureKey as string}`, (req, res, ctx) => {
+          rest.get(pathRegexp, (req, res, ctx) => {
             // @ts-expect-error any
-            return handler({ ...req, getInput: () => getInput(req) }, res, {
+            return handler({ ...req, getInput: () => getQueryInput(req) }, res, {
               ...ctx,
-              data: (body: typeof x) => ctx.json(transformBody(body)),
+              data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
             })
           })
 
         procedure.mutation = handler =>
-          rest.post(`${baseUrl}/${procedureKey as string}`, (req, res, ctx) => {
+          rest.post(pathRegexp, (req, res, ctx) => {
             // @ts-expect-error any
-            return handler({ ...req, getInput: () => getInput(req) }, res, {
+            return handler(req, res, {
               ...ctx,
-              data: body => ctx.json(transformBody(body)),
+              data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
             })
           })
 

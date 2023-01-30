@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="assets/trpc-msw.png" style="height: 100px;"/>
   <h1>msw-trpc</h1>
@@ -58,6 +57,25 @@ trpcMsw.myQuery.query((req, res, ctx) => {})
 
 // all mutations will expose a mutation function that accepts a MSW handler
 trpcMsw.myMutation.mutation((req, res, ctx) => {})
+```
+
+**supports merged routers**
+
+```typescript
+// @filename: routers/_app.ts
+// taken from https://trpc.io/docs/merging-routers
+import { userRouter } from './user'
+import { postRouter } from './post'
+
+const appRouter = router({
+  user: userRouter, // put procedures under "user" namespace
+  post: postRouter, // put procedures under "post" namespace
+})
+
+// @filename: frontend/test/PostList.tsx
+
+// all nested routers will be infered properly
+trpcMsw.user.list.query((req, res, ctx) => {})
 ```
 
 ## MSW Augments
@@ -149,3 +167,8 @@ Peer dependencies:
 Please note:
 
 - Batch is not yet supported
+- Merged routers will match in MSW against . or / (I'm open to PRs on how to only match against . 😊 )
+
+```typescript
+mswTrpc.user.list.query() // this will match /trpc/user/list and /trpc/user.list
+```

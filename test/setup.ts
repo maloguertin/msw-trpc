@@ -45,6 +45,12 @@ const appRouter = t.router({
 })
 export type AppRouter = typeof appRouter
 
+const nestedRouter = t.router({
+  users: appRouter,
+})
+
+export type NestedAppRouter = typeof nestedRouter
+
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
@@ -58,4 +64,18 @@ export const trpc = createTRPCProxyClient<AppRouter>({
   ],
 })
 
+export const nestedTrpc = createTRPCProxyClient<NestedAppRouter>({
+  links: [
+    httpLink({
+      url: 'http://localhost:3000/trpc',
+      headers() {
+        return {
+          'content-type': 'application/json',
+        }
+      },
+    }),
+  ],
+})
+
 export const mswTrpc = createTRPCMsw<AppRouter>()
+export const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()

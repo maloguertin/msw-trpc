@@ -8,7 +8,7 @@ import {
   MockedRequest,
   RestContext,
 } from 'msw'
-import { mswTrpc, User } from './setup'
+import { mswTrpc, nestedMswTrpc, User } from './setup'
 
 describe('proxy returned by createMswTrpc', () => {
   it('should expose property query on properties that match TRPC query procedures', () => {
@@ -36,5 +36,21 @@ describe('proxy returned by createMswTrpc', () => {
         >
       ) => RestHandler<MockedRequest<DefaultBodyType>>
     >()
+  })
+
+  describe('with merged routers', () => {
+    it('should expose property query on properties that match TRPC query procedures', () => {
+      expectTypeOf(nestedMswTrpc.users.userById.query).toEqualTypeOf<
+        (
+          handler: ResponseResolver<
+            RestRequest<never, PathParams<string>> & { getInput: () => string },
+            RestContext & {
+              data: (data: User | undefined) => any
+            },
+            DefaultBodyType
+          >
+        ) => RestHandler<MockedRequest<DefaultBodyType>>
+      >()
+    })
   })
 })

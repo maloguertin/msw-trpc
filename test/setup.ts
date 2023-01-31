@@ -28,6 +28,19 @@ const appRouter = t.router({
 
       return user
     }),
+  userByIdAndPost: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .query(req => {
+      const { input } = req
+
+      const user = userList.find(u => u.id === input)
+
+      return { ...user, posts: ['1'] }
+    }),
   createUser: t.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val

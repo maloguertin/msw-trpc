@@ -82,7 +82,7 @@ const createTRPCMsw = <Router extends AnyRouter>(
   type ExtractKeys<T extends Router[any], K extends keyof T = keyof T> = T[K] extends
     | BuildProcedure<'query', any, any>
     | BuildProcedure<'mutation', any, any>
-    | Router[any]
+    | AnyRouter
     ? K
     : never
 
@@ -128,11 +128,11 @@ const createTRPCMsw = <Router extends AnyRouter>(
     ? Mutation<T, K>
     : T[K] extends BuildProcedure<'query', any, any>
     ? Query<T, K>
-    : T[K] extends Router[any]
+    : T[K] extends AnyRouter
     ? MswTrpc<T[K]>
     : never
 
-  type MswTrpc<T extends Router | Router[any]> = {
+  type MswTrpc<T extends Router | AnyRouter> = {
     [key in keyof T as ExtractKeys<T, key>]: ExtractProcedureHandler<T, key>
   }
 

@@ -8,7 +8,8 @@ import {
   MockedRequest,
   RestContext,
 } from 'msw'
-import { mswTrpc, nestedMswTrpc, User } from './setup'
+import superjson from 'superjson'
+import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
 
 describe('proxy returned by createMswTrpc', () => {
   it('should expose property query on properties that match TRPC query procedures', () => {
@@ -48,6 +49,21 @@ describe('proxy returned by createMswTrpc', () => {
               data: (data: User | undefined) => any
             },
             DefaultBodyType
+          >
+        ) => RestHandler<MockedRequest<DefaultBodyType>>
+      >()
+    })
+  })
+
+  describe('with transformer', () => {
+    it('context.data should return the correct type', () => {
+      expectTypeOf(mswTrpcWithSuperJson.createUser.mutation).toEqualTypeOf<
+        (
+          handler: ResponseResolver<
+            RestRequest<string, PathParams>,
+            RestContext & {
+              data: (data: User) => ReturnType<superjson['serialize']>
+            }
           >
         ) => RestHandler<MockedRequest<DefaultBodyType>>
       >()

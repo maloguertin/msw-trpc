@@ -4,7 +4,6 @@ import {
   MockedRequest,
   PathParams,
   ResponseResolver,
-  ResponseTransformer,
   rest,
   RestContext,
   RestHandler,
@@ -96,7 +95,7 @@ const createTRPCMsw = <Router extends AnyRouter>(
   type ContextWithDataTransformer<T extends Router[any], K extends keyof T = keyof T> = RestContext & {
     data: (
       data: T[K] extends BuildProcedure<any, any, infer P> ? P : never
-    ) => ResponseTransformer<DefaultBodyType, any>
+    ) => ReturnType<CombinedDataTransformer['input']['serialize']>
   }
 
   type SetQueryHandler<T extends Router[any], K extends keyof T> = (

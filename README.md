@@ -38,10 +38,10 @@ export const trpcMsw = createTRPCMsw<AppRouter>() /* 👈 */
 
 ```typescript
 const server = setupServer(
-  mswTrpc.userById.query((req, res, ctx) => {
+  trpcMsw.userById.query((req, res, ctx) => {
     return res(ctx.status(200), ctx.data({ id: '1', name: 'Uncle bob' }))
   }),
-  mswTrpc.createUser.mutation(async (req, res, ctx) => {
+  trpcMsw.createUser.mutation(async (req, res, ctx) => {
     return res(ctx.status(200), ctx.data({ id: '2', name: await req.json() }))
   })
 )

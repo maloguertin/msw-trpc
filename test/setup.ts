@@ -105,6 +105,22 @@ const appRouterWithSuperJson = tWithSuperJson.router({
         name: input,
       } as User
     }),
+  listUsers: t.procedure
+    .input((val: unknown) => {
+      return val as { take: number; skip: number }
+    })
+    .query(req => {
+      const { input } = req
+      return input
+    }),
+  createFriend: t.procedure
+    .input((val: unknown) => {
+      return val as { name: string }
+    })
+    .mutation(req => {
+      const { input } = req
+      return { id: 'new-user', name: input.name }
+    }),
 })
 
 export type AppRouter = typeof appRouter

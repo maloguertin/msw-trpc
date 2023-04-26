@@ -30,7 +30,7 @@ describe('proxy returned by createMswTrpc', () => {
     expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
       (
         handler: ResponseResolver<
-          RestRequest<string, PathParams>,
+          RestRequest<string, PathParams> & { getInput: () => string },
           RestContext & {
             data: (data: User) => any
           }
@@ -60,10 +60,24 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpcWithSuperJson.createUser.mutation).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<string, PathParams>,
+            RestRequest<string, PathParams> & { getInput: () => string },
             RestContext & {
               data: (data: User) => ReturnType<superjson['serialize']>
             }
+          >
+        ) => RestHandler<MockedRequest<DefaultBodyType>>
+      >()
+    })
+
+    it('req.getInput should return the correct type', () => {
+      expectTypeOf(mswTrpcWithSuperJson.userById.query).toEqualTypeOf<
+        (
+          handler: ResponseResolver<
+            RestRequest<never, PathParams<string>> & { getInput: () => string },
+            RestContext & {
+              data: (data: User | undefined) => any
+            },
+            DefaultBodyType
           >
         ) => RestHandler<MockedRequest<DefaultBodyType>>
       >()

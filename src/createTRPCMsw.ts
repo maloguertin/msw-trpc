@@ -1,4 +1,12 @@
-import { AnyRouter, BuildProcedure, CombinedDataTransformer, defaultTransformer, ProcedureParams } from '@trpc/server'
+import {
+  AnyRouter,
+  BuildProcedure,
+  CombinedDataTransformer,
+  defaultTransformer,
+  inferRouterInputs,
+  ProcedureParams,
+} from '@trpc/server'
+
 import {
   DefaultBodyType,
   MockedRequest,
@@ -10,12 +18,18 @@ import {
   RestRequest,
 } from 'msw'
 
-const getQueryInput = (req: RestRequest) => {
+const getQueryInput = (req: RestRequest, transformer: CombinedDataTransformer) => {
   const inputString = req.url.searchParams.get('input')
 
-  if (inputString === null) return {}
+  if (inputString == null) return inputString
 
-  return JSON.parse(inputString)
+  return transformer.input.deserialize(JSON.parse(inputString))
+}
+
+const getMutationInput = async (req: RestRequest, transformer: CombinedDataTransformer) => {
+  const body = await req.json()
+
+  return transformer.output.deserialize(body)
 }
 
 const getRegexpAsString = (baseUrl: string | RegExp) => {
@@ -47,7 +61,11 @@ const createUntypedTRPCMsw = (
           // @ts-expect-error any
           return handler =>
             rest.get(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              return handler({ ...req, getInput: () => getQueryInput(req) }, res, {
+              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
+                getInput: () => getQueryInput(req, transformer),
+              })
+
+              return handler(augmentedReq, res, {
                 ...ctx,
                 // @ts-expect-error any
                 data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
@@ -59,7 +77,10 @@ const createUntypedTRPCMsw = (
           // @ts-expect-error any
           return handler =>
             rest.post(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              return handler(req, res, {
+              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
+                getInput: () => getMutationInput(req, transformer),
+              })
+              return handler(augmentedReq, res, {
                 ...ctx,
                 // @ts-expect-error any
                 data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
@@ -89,11 +110,13 @@ const createTRPCMsw = <Router extends AnyRouter>(
   type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<any, any, any, infer P> ? P : never
 
   type WithInput<T extends Router[any], K extends keyof T = keyof T> = {
-    getInput: () => T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : never
+    getInput: () => T[K] extends BuildProcedure<any, infer P, any> ? inferRouterInputs<T>[K] : never
   }
 
   type ContextWithDataTransformer<T extends Router[any], K extends keyof T = keyof T> = RestContext & {
-    data: (data: T[K] extends BuildProcedure<any, any, infer P> ? P : never) => any
+    data: (
+      data: T[K] extends BuildProcedure<any, any, infer P> ? P : never
+    ) => ReturnType<CombinedDataTransformer['input']['serialize']>
   }
 
   type SetQueryHandler<T extends Router[any], K extends keyof T> = (
@@ -107,7 +130,8 @@ const createTRPCMsw = <Router extends AnyRouter>(
   type SetMutationHandler<T extends Router[any], K extends keyof T> = (
     handler: ResponseResolver<
       //@ts-expect-error DefaultBodyType doesn't handle unknown but it will be resolved at usage time
-      RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams>,
+      RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams> &
+        WithInput<T, K>,
       ContextWithDataTransformer<T, K>
     >
   ) => RestHandler<MockedRequest<DefaultBodyType>>

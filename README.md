@@ -101,8 +101,6 @@ mswTrpc.userById.query((req, res, ctx) => {
 
 **req.getInput**
 
-Only available in query handlers
-
 Returns the parsed input from the request
 
 ```typescript
@@ -120,6 +118,10 @@ mswTrpc.userById.query((req, res, ctx) => {
   console.log(req.getInput()) /* 👈 */
 })
 
+mswTrpc.createUser.mutation(async (req, res, ctx) => {
+  console.log(await req.getInput()) /* 👈 in mutation handle getInput returns a promise because it uses req.json() */
+})
+
 // outputs
 {
   name: 'Pedro'
@@ -129,6 +131,10 @@ test('should do something', () => {
   trpc.userById.query({ name: 'Pedro' })
 })
 ```
+
+Please note:
+
+- calling `req.getInput` and req.json in the same mutation handler will fail
 
 ## Config
 

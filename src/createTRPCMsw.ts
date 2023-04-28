@@ -1,22 +1,8 @@
-import {
-  AnyRouter,
-  BuildProcedure,
-  CombinedDataTransformer,
-  defaultTransformer,
-  inferRouterInputs,
-  ProcedureParams,
-} from '@trpc/server'
+import { AnyRouter, CombinedDataTransformer, defaultTransformer } from '@trpc/server'
+import type { RestRequest } from 'msw'
 
-import {
-  DefaultBodyType,
-  MockedRequest,
-  PathParams,
-  ResponseResolver,
-  rest,
-  RestContext,
-  RestHandler,
-  RestRequest,
-} from 'msw'
+import { rest } from 'msw'
+import { MswTrpc } from './types'
 
 const getQueryInput = (req: RestRequest, transformer: CombinedDataTransformer) => {
   const inputString = req.url.searchParams.get('input')
@@ -100,66 +86,6 @@ const createUntypedTRPCMsw = (
 const createTRPCMsw = <Router extends AnyRouter>(
   config: { baseUrl?: string; basePath?: string; transformer?: CombinedDataTransformer } = {}
 ) => {
-  type ExtractKeys<T extends Router[any], K extends keyof T = keyof T> = T[K] extends
-    | BuildProcedure<'query', any, any>
-    | BuildProcedure<'mutation', any, any>
-    | AnyRouter
-    ? K
-    : never
-
-  type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<any, any, any, infer P> ? P : never
-
-  type WithInput<T extends Router[any], K extends keyof T = keyof T> = {
-    getInput: () => T[K] extends BuildProcedure<any, infer P, any> ? inferRouterInputs<T>[K] : never
-  }
-
-  type ContextWithDataTransformer<T extends Router[any], K extends keyof T = keyof T> = RestContext & {
-    data: (
-      data: T[K] extends BuildProcedure<any, any, infer P> ? P : never
-    ) => ReturnType<CombinedDataTransformer['input']['serialize']>
-  }
-
-  type SetQueryHandler<T extends Router[any], K extends keyof T> = (
-    handler: ResponseResolver<
-      RestRequest<never, PathParams<string>> & WithInput<T, K>,
-      ContextWithDataTransformer<T, K>,
-      DefaultBodyType
-    >
-  ) => RestHandler<MockedRequest<DefaultBodyType>>
-
-  type SetMutationHandler<T extends Router[any], K extends keyof T> = (
-    handler: ResponseResolver<
-      //@ts-expect-error DefaultBodyType doesn't handle unknown but it will be resolved at usage time
-      RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams> &
-        WithInput<T, K>,
-      ContextWithDataTransformer<T, K>
-    >
-  ) => RestHandler<MockedRequest<DefaultBodyType>>
-
-  type Query<T extends Router[any], K extends keyof T> = {
-    query: SetQueryHandler<T, K>
-  }
-
-  type Mutation<T extends Router[any], K extends keyof T> = {
-    mutation: SetMutationHandler<T, K>
-  }
-
-  type ExtractProcedureHandler<T extends Router | Router[any], K extends keyof T> = T[K] extends BuildProcedure<
-    'mutation',
-    any,
-    any
-  >
-    ? Mutation<T, K>
-    : T[K] extends BuildProcedure<'query', any, any>
-    ? Query<T, K>
-    : T[K] extends AnyRouter
-    ? MswTrpc<T[K]>
-    : never
-
-  type MswTrpc<T extends Router | AnyRouter> = {
-    [key in keyof T as ExtractKeys<T, key>]: ExtractProcedureHandler<T, key>
-  }
-
   return createUntypedTRPCMsw(config) as MswTrpc<Router>
 }
 

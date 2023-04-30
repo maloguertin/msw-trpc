@@ -7,8 +7,8 @@ import {
   RestHandler,
   MockedRequest,
   RestContext,
+  ResponseTransformer,
 } from 'msw'
-import superjson from 'superjson'
 import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
 
 describe('proxy returned by createMswTrpc', () => {
@@ -18,7 +18,7 @@ describe('proxy returned by createMswTrpc', () => {
         handler: ResponseResolver<
           RestRequest<never, PathParams<string>> & { getInput: () => string },
           RestContext & {
-            data: (data: User | undefined) => any
+            data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
           },
           DefaultBodyType
         >
@@ -32,7 +32,7 @@ describe('proxy returned by createMswTrpc', () => {
         handler: ResponseResolver<
           RestRequest<string, PathParams> & { getInput: () => string },
           RestContext & {
-            data: (data: User) => any
+            data: (data: User) => ResponseTransformer<DefaultBodyType, any>
           }
         >
       ) => RestHandler<MockedRequest<DefaultBodyType>>
@@ -46,7 +46,7 @@ describe('proxy returned by createMswTrpc', () => {
           handler: ResponseResolver<
             RestRequest<never, PathParams<string>> & { getInput: () => string },
             RestContext & {
-              data: (data: User | undefined) => any
+              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
             },
             DefaultBodyType
           >
@@ -62,7 +62,7 @@ describe('proxy returned by createMswTrpc', () => {
           handler: ResponseResolver<
             RestRequest<string, PathParams> & { getInput: () => string },
             RestContext & {
-              data: (data: User) => ReturnType<superjson['serialize']>
+              data: (data: User) => ResponseTransformer<DefaultBodyType, any>
             }
           >
         ) => RestHandler<MockedRequest<DefaultBodyType>>
@@ -75,7 +75,7 @@ describe('proxy returned by createMswTrpc', () => {
           handler: ResponseResolver<
             RestRequest<never, PathParams<string>> & { getInput: () => string },
             RestContext & {
-              data: (data: User | undefined) => any
+              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
             },
             DefaultBodyType
           >

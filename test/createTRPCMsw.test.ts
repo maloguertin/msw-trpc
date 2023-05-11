@@ -30,7 +30,7 @@ describe('proxy returned by createMswTrpc', () => {
     expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
       (
         handler: ResponseResolver<
-          RestRequest<string, PathParams> & { getInput: () => string },
+          RestRequest<string, PathParams> & { getInput: () => Promise<string> },
           RestContext & {
             data: (data: User) => ResponseTransformer<DefaultBodyType, any>
           }
@@ -60,7 +60,7 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpcWithSuperJson.createUser.mutation).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<string, PathParams> & { getInput: () => string },
+            RestRequest<string, PathParams> & { getInput: () => Promise<string> },
             RestContext & {
               data: (data: User) => ResponseTransformer<DefaultBodyType, any>
             }

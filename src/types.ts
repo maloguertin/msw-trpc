@@ -27,7 +27,7 @@ export type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<
     : DefaultBodyType
   : never
 
-export type WithInput<T, K extends keyof T = keyof T> = {
+export type WithQueryInput<T, K extends keyof T = keyof T> = {
   getInput: () => T[K] extends BuildProcedure<any, any, any>
     ? T extends AnyRouter
       ? inferRouterInputs<T>[K]
@@ -35,9 +35,17 @@ export type WithInput<T, K extends keyof T = keyof T> = {
     : never
 }
 
+export type WithMutationInput<T, K extends keyof T = keyof T> = {
+  getInput: () => T[K] extends BuildProcedure<any, any, any>
+    ? T extends AnyRouter
+      ? Promise<inferRouterInputs<T>[K]>
+      : never
+    : never
+}
+
 export type SetQueryHandler<T, K extends keyof T> = (
   handler: ResponseResolver<
-    RestRequest<never, PathParams<string>> & WithInput<T, K>,
+    RestRequest<never, PathParams<string>> & WithQueryInput<T, K>,
     ContextWithDataTransformer<T[K]>,
     DefaultBodyType
   >
@@ -46,7 +54,7 @@ export type SetQueryHandler<T, K extends keyof T> = (
 export type SetMutationHandler<T, K extends keyof T> = (
   handler: ResponseResolver<
     RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams> &
-      WithInput<T, K>,
+      WithMutationInput<T, K>,
     ContextWithDataTransformer<T[K]>
   >
 ) => RestHandler<MockedRequest<DefaultBodyType>>

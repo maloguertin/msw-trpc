@@ -1,4 +1,4 @@
-import { AnyRouter, BuildProcedure, ProcedureParams, inferRouterInputs } from '@trpc/server'
+import { AnyRouter, BuildProcedure, Procedure, ProcedureParams, ProcedureType, inferRouterInputs } from '@trpc/server'
 import {
   DefaultBodyType,
   MockedRequest,
@@ -11,7 +11,9 @@ import {
 } from 'msw'
 
 export type ContextWithDataTransformer<T> = RestContext & {
-  data: (data: T extends BuildProcedure<any, any, infer P> ? P : never) => ResponseTransformer<DefaultBodyType, any>
+  data: (
+    data: T extends Procedure<ProcedureType, infer ProcedureParams> ? ProcedureParams['_output_out'] : never
+  ) => ResponseTransformer<DefaultBodyType, any>
 }
 
 export type ExtractKeys<T, K extends keyof T = keyof T> = T[K] extends

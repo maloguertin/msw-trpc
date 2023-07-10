@@ -48,6 +48,31 @@ const appRouter = t.router({
 
       return { ...user, posts: ['1'] }
     }),
+  userByName: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .output((val: unknown) => {
+      if (typeof val === 'undefined') {
+        return val
+      }
+      if (typeof val !== 'object' || val === null) {
+        throw new Error(`Invalid output: ${typeof val}`)
+      }
+      if (!('id' in val) || typeof val.id !== 'string' || !('name' in val) || typeof val.name !== 'string') {
+        throw new Error(`Invalid output: ${typeof val}`)
+      }
+      return val as User
+    })
+    .query(req => {
+      const { input } = req
+
+      const user = userList.find(u => u.name === input)
+
+      return user
+    }),
   createUser: t.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val
@@ -61,6 +86,33 @@ const appRouter = t.router({
         id: '2',
         name: input,
       } as User
+    }),
+  updateUser: t.procedure
+    .input((val: unknown) => {
+      if (typeof val !== 'object' || val === null) {
+        throw new Error(`Invalid input: ${typeof val}`)
+      }
+      if (!('id' in val) || !('name' in val)) {
+        throw new Error(`Invalid input: ${typeof val}`)
+      }
+      if (typeof val.id !== 'string' || typeof val.name !== 'string') {
+        throw new Error(`Invalid input: ${typeof val}`)
+      }
+      return val as User
+    })
+    .output((val: unknown) => {
+      if (typeof val !== 'object' || val === null) {
+        throw new Error(`Invalid output: ${typeof val}`)
+      }
+      if (!('id' in val) || typeof val.id !== 'string' || !('name' in val) || typeof val.name !== 'string') {
+        throw new Error(`Invalid output: ${typeof val}`)
+      }
+      return val as User
+    })
+    .mutation(req => {
+      const { input } = req
+
+      return input
     }),
 })
 

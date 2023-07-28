@@ -83,4 +83,34 @@ describe('proxy returned by createMswTrpc', () => {
       >()
     })
   })
+
+  describe('with output transformer', () => {
+    it('query context.data should consider output transformer', () => {
+      expectTypeOf(mswTrpc.userByName.query).toEqualTypeOf<
+        (
+          handler: ResponseResolver<
+            RestRequest<never, PathParams<string>> & { getInput: () => string },
+            RestContext & {
+              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
+            },
+            DefaultBodyType
+          >
+        ) => RestHandler<MockedRequest<DefaultBodyType>>
+      >()
+    })
+
+    it('mutation context.data should consider output transformer', () => {
+      expectTypeOf(mswTrpc.updateUser.mutation).toEqualTypeOf<
+        (
+          handler: ResponseResolver<
+            RestRequest<User, PathParams> & { getInput: () => Promise<User> },
+            RestContext & {
+              data: (data: User) => ResponseTransformer<DefaultBodyType, any>
+            },
+            DefaultBodyType
+          >
+        ) => RestHandler<MockedRequest<DefaultBodyType>>
+      >()
+    })
+  })
 })

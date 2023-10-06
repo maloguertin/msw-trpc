@@ -17,23 +17,23 @@ type NestedMswTrpc = typeof nestedMswTrpc
 
 const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
   return setupServer(
-    mswTrpc.userById.query((req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo' }))
+    mswTrpc.userById.query(({ data }) => {
+      return data({ id: '1', name: 'Malo' })
     }),
-    mswTrpc.userByIdAndPost.query((req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo', posts: ['1'] }))
+    mswTrpc.userByIdAndPost.query(({ data }) => {
+      return data({ id: '1', name: 'Malo', posts: ['1'] })
     }),
-    mswTrpc.createUser.mutation(async (req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '2', name: await req.json() }))
+    mswTrpc.createUser.mutation(async ({ data, getInput }) => {
+      return data({ id: '2', name: await getInput() })
     }),
-    nestedMswTrpc.users.userById.query((req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo' }))
+    nestedMswTrpc.users.userById.query(({ data }) => {
+      return data({ id: '1', name: 'Malo' })
     }),
-    nestedMswTrpc.users.userByIdAndPost.query((req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo', posts: ['1'] }))
+    nestedMswTrpc.users.userByIdAndPost.query(({ data }) => {
+      return data({ id: '1', name: 'Malo', posts: ['1'] })
     }),
-    nestedMswTrpc.users.createUser.mutation(async (req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '2', name: await req.json() }))
+    nestedMswTrpc.users.createUser.mutation(async ({ data, getInput }) => {
+      return data({ id: '2', name: await getInput() })
     })
   )
 }
@@ -124,12 +124,12 @@ describe('config', () => {
 
   describe('with SuperJson transformer', () => {
     const serverWithSuperJson = setupServer(
-      mswTrpcWithSuperJson.listUsers.query((req, res, ctx) => {
-        return res(ctx.status(200), ctx.data(req.getInput()))
+      mswTrpcWithSuperJson.listUsers.query(({ data, getInput }) => {
+        return data(getInput())
       }),
-      mswTrpcWithSuperJson.createFriend.mutation(async (req, res, ctx) => {
-        const input = await req.getInput()
-        return res(ctx.status(200), ctx.data({ name: input.name, id: 'new-friend' }))
+      mswTrpcWithSuperJson.createFriend.mutation(async ({ data, getInput }) => {
+        const input = await getInput()
+        return data({ name: input.name, id: 'new-friend' })
       })
     )
 

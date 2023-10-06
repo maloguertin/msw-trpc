@@ -1,18 +1,17 @@
 import { AnyRouter, CombinedDataTransformer, defaultTransformer } from '@trpc/server'
-import type { RestRequest } from 'msw'
 
-import { rest } from 'msw'
+import { HttpResponse, HttpResponseInit, http } from 'msw'
 import { MswTrpc } from './types'
 
-const getQueryInput = (req: RestRequest, transformer: CombinedDataTransformer) => {
-  const inputString = req.url.searchParams.get('input')
+const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
+  const inputString = new URL(req.url).searchParams.get('input')
 
   if (inputString == null) return inputString
 
   return transformer.input.deserialize(JSON.parse(inputString))
 }
 
-const getMutationInput = async (req: RestRequest, transformer: CombinedDataTransformer) => {
+const getMutationInput = async (req: Request, transformer: CombinedDataTransformer) => {
   const body = await req.json()
 
   return transformer.output.deserialize(body)
@@ -46,15 +45,13 @@ const createUntypedTRPCMsw = (
         if (procedureKey === 'query') {
           // @ts-expect-error any
           return handler =>
-            rest.get(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
-                getInput: () => getQueryInput(req, transformer),
-              })
-
-              return handler(augmentedReq, res, {
-                ...ctx,
+            http.get(buildUrlFromPathParts(pathParts), params => {
+              return handler({
+                ...params,
+                getInput: () => getQueryInput(params.request, transformer),
                 // @ts-expect-error any
-                data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
+                data: (body, init?: HttpResponseInit) =>
+                  HttpResponse.json({ result: { data: transformer.input.serialize(body) } }, init),
               })
             })
         }
@@ -62,14 +59,13 @@ const createUntypedTRPCMsw = (
         if (procedureKey === 'mutation') {
           // @ts-expect-error any
           return handler =>
-            rest.post(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
-                getInput: () => getMutationInput(req, transformer),
-              })
-              return handler(augmentedReq, res, {
-                ...ctx,
+            http.post(buildUrlFromPathParts(pathParts), params => {
+              return handler({
+                ...params,
+                getInput: () => getMutationInput(params.request, transformer),
                 // @ts-expect-error any
-                data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
+                data: (body, init?: HttpResponseInit) =>
+                  HttpResponse.json({ result: { data: transformer.input.serialize(body) } }, init),
               })
             })
         }

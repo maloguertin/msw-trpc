@@ -1,28 +1,22 @@
 import { expectTypeOf } from 'expect-type'
-import {
-  ResponseResolver,
-  RestRequest,
-  PathParams,
-  DefaultBodyType,
-  RestHandler,
-  MockedRequest,
-  RestContext,
-  ResponseTransformer,
-} from 'msw'
+import { ResponseResolver, DefaultBodyType, HttpResponse, RequestHandler, HttpResponseInit, StrictResponse } from 'msw'
 import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
+
+type ResultData<T> = { result: { data: T } }
 
 describe('proxy returned by createMswTrpc', () => {
   it('should expose property query on properties that match TRPC query procedures', () => {
     expectTypeOf(mswTrpc.userById.query).toEqualTypeOf<
       (
         handler: ResponseResolver<
-          RestRequest<never, PathParams<string>> & { getInput: () => string },
-          RestContext & {
-            data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
+          {
+            getInput: () => string
+            data: (data: User | undefined, init?: HttpResponseInit) => StrictResponse<ResultData<User | undefined>>
           },
-          DefaultBodyType
+          DefaultBodyType,
+          ResultData<User | undefined>
         >
-      ) => RestHandler<MockedRequest<DefaultBodyType>>
+      ) => RequestHandler
     >()
   })
 
@@ -30,12 +24,14 @@ describe('proxy returned by createMswTrpc', () => {
     expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
       (
         handler: ResponseResolver<
-          RestRequest<string, PathParams> & { getInput: () => Promise<string> },
-          RestContext & {
-            data: (data: User) => ResponseTransformer<DefaultBodyType, any>
-          }
+          {
+            getInput: () => Promise<string>
+            data: (data: User, init?: HttpResponseInit) => StrictResponse<ResultData<User>>
+          },
+          string,
+          ResultData<User>
         >
-      ) => RestHandler<MockedRequest<DefaultBodyType>>
+      ) => RequestHandler
     >()
   })
 
@@ -44,13 +40,14 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(nestedMswTrpc.users.userById.query).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<never, PathParams<string>> & { getInput: () => string },
-            RestContext & {
-              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
+            {
+              getInput: () => string
+              data: (data: User | undefined, init?: HttpResponseInit) => StrictResponse<ResultData<User | undefined>>
             },
-            DefaultBodyType
+            DefaultBodyType,
+            ResultData<User | undefined>
           >
-        ) => RestHandler<MockedRequest<DefaultBodyType>>
+        ) => RequestHandler
       >()
     })
   })
@@ -60,12 +57,14 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpcWithSuperJson.createUser.mutation).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<string, PathParams> & { getInput: () => Promise<string> },
-            RestContext & {
-              data: (data: User) => ResponseTransformer<DefaultBodyType, any>
-            }
+            {
+              getInput: () => Promise<string>
+              data: (data: User, init?: HttpResponseInit) => StrictResponse<ResultData<User>>
+            },
+            string,
+            ResultData<User>
           >
-        ) => RestHandler<MockedRequest<DefaultBodyType>>
+        ) => RequestHandler
       >()
     })
 
@@ -73,13 +72,14 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpcWithSuperJson.userById.query).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<never, PathParams<string>> & { getInput: () => string },
-            RestContext & {
-              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
+            {
+              getInput: () => string
+              data: (data: User | undefined, init?: HttpResponseInit) => StrictResponse<ResultData<User | undefined>>
             },
-            DefaultBodyType
+            DefaultBodyType,
+            ResultData<User | undefined>
           >
-        ) => RestHandler<MockedRequest<DefaultBodyType>>
+        ) => RequestHandler
       >()
     })
   })
@@ -89,13 +89,14 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpc.userByName.query).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<never, PathParams<string>> & { getInput: () => string },
-            RestContext & {
-              data: (data: User | undefined) => ResponseTransformer<DefaultBodyType, any>
+            {
+              getInput: () => string
+              data: (data: User | undefined, init?: HttpResponseInit) => StrictResponse<ResultData<User | undefined>>
             },
-            DefaultBodyType
+            DefaultBodyType,
+            ResultData<User | undefined>
           >
-        ) => RestHandler<MockedRequest<DefaultBodyType>>
+        ) => RequestHandler
       >()
     })
 
@@ -103,13 +104,14 @@ describe('proxy returned by createMswTrpc', () => {
       expectTypeOf(mswTrpc.updateUser.mutation).toEqualTypeOf<
         (
           handler: ResponseResolver<
-            RestRequest<User, PathParams> & { getInput: () => Promise<User> },
-            RestContext & {
-              data: (data: User) => ResponseTransformer<DefaultBodyType, any>
+            {
+              getInput: () => Promise<User>
+              data: (data: User, init?: HttpResponseInit) => StrictResponse<ResultData<User>>
             },
-            DefaultBodyType
+            User,
+            ResultData<User>
           >
-        ) => RestHandler<MockedRequest<DefaultBodyType>>
+        ) => RequestHandler
       >()
     })
   })

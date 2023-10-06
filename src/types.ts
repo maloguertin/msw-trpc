@@ -1,20 +1,5 @@
 import { AnyRouter, BuildProcedure, Procedure, ProcedureParams, ProcedureType, inferRouterInputs } from '@trpc/server'
-import {
-  DefaultBodyType,
-  MockedRequest,
-  PathParams,
-  ResponseResolver,
-  ResponseTransformer,
-  RestContext,
-  RestHandler,
-  RestRequest,
-} from 'msw'
-
-export type ContextWithDataTransformer<T> = RestContext & {
-  data: (
-    data: T extends Procedure<ProcedureType, infer ProcedureParams> ? ProcedureParams['_output_out'] : never
-  ) => ResponseTransformer<DefaultBodyType, any>
-}
+import { DefaultBodyType, HttpResponse, HttpResponseInit, RequestHandler, ResponseResolver, StrictResponse } from 'msw'
 
 export type ExtractKeys<T, K extends keyof T = keyof T> = T[K] extends
   | BuildProcedure<'query', any, any>
@@ -28,6 +13,21 @@ export type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<
     ? P
     : DefaultBodyType
   : never
+
+export type ExtractOutput<T> = T extends Procedure<ProcedureType, infer ProcedureParams>
+  ? ProcedureParams['_output_out'] extends DefaultBodyType
+    ? { result: { data: ProcedureParams['_output_out'] } }
+    : never
+  : never
+
+export type TRPCResponse<T> = StrictResponse<ExtractOutput<T>>
+
+type WithDataHelper<T> = {
+  data: (
+    data: T extends Procedure<ProcedureType, infer ProcedureParams> ? ProcedureParams['_output_out'] : never,
+    init?: HttpResponseInit
+  ) => TRPCResponse<T>
+}
 
 export type WithQueryInput<T, K extends keyof T = keyof T> = {
   getInput: () => T[K] extends BuildProcedure<any, any, any>
@@ -46,20 +46,16 @@ export type WithMutationInput<T, K extends keyof T = keyof T> = {
 }
 
 export type SetQueryHandler<T, K extends keyof T> = (
-  handler: ResponseResolver<
-    RestRequest<never, PathParams<string>> & WithQueryInput<T, K>,
-    ContextWithDataTransformer<T[K]>,
-    DefaultBodyType
-  >
-) => RestHandler<MockedRequest<DefaultBodyType>>
+  handler: ResponseResolver<WithDataHelper<T[K]> & WithQueryInput<T, K>, DefaultBodyType, ExtractOutput<T[K]>>
+) => RequestHandler
 
 export type SetMutationHandler<T, K extends keyof T> = (
   handler: ResponseResolver<
-    RestRequest<T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType, PathParams> &
-      WithMutationInput<T, K>,
-    ContextWithDataTransformer<T[K]>
+    WithDataHelper<T[K]> & WithMutationInput<T, K>,
+    T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType,
+    ExtractOutput<T[K]>
   >
-) => RestHandler<MockedRequest<DefaultBodyType>>
+) => RequestHandler
 
 export type Query<T, K extends keyof T> = {
   query: SetQueryHandler<T, K>

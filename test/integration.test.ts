@@ -11,29 +11,31 @@ import {
 
 import { setupServer } from 'msw/node'
 import { createTRPCMsw } from '../src'
+import { TRPCError } from '@trpc/server'
+import { TRPCClientError } from '@trpc/client'
 
 type MswTrpc = typeof mswTrpc
 type NestedMswTrpc = typeof nestedMswTrpc
 
 const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
   return setupServer(
-    mswTrpc.userById.query(({ data }) => {
-      return data({ id: '1', name: 'Malo' })
+    mswTrpc.userById.query(() => {
+      return { id: '1', name: 'Malo' }
     }),
-    mswTrpc.userByIdAndPost.query(({ data }) => {
-      return data({ id: '1', name: 'Malo', posts: ['1'] })
+    mswTrpc.userByIdAndPost.query(() => {
+      return { id: '1', name: 'Malo', posts: ['1'] }
     }),
-    mswTrpc.createUser.mutation(async ({ data, getInput }) => {
-      return data({ id: '2', name: await getInput() })
+    mswTrpc.createUser.mutation(name => {
+      return { id: '2', name }
     }),
-    nestedMswTrpc.users.userById.query(({ data }) => {
-      return data({ id: '1', name: 'Malo' })
+    nestedMswTrpc.users.userById.query(() => {
+      return { id: '1', name: 'Malo' }
     }),
-    nestedMswTrpc.users.userByIdAndPost.query(({ data }) => {
-      return data({ id: '1', name: 'Malo', posts: ['1'] })
+    nestedMswTrpc.users.userByIdAndPost.query(() => {
+      return { id: '1', name: 'Malo', posts: ['1'] }
     }),
-    nestedMswTrpc.users.createUser.mutation(async ({ data, getInput }) => {
-      return data({ id: '2', name: await getInput() })
+    nestedMswTrpc.users.createUser.mutation(name => {
+      return { id: '2', name }
     })
   )
 }
@@ -75,6 +77,17 @@ describe('queries and mutations', () => {
 
       expect(user).toEqual({ id: '2', name: 'Robert' })
     })
+  })
+
+  test('throwing error works', async () => {
+    server.use(
+      mswTrpc.userById.query(() => {
+        throw new TRPCError({ code: 'BAD_REQUEST' })
+      })
+    )
+    await expect(async () => {
+      await trpc.userById.query('1')
+    }).rejects.toThrow(new TRPCClientError('BAD_REQUEST'))
   })
 })
 
@@ -124,12 +137,11 @@ describe('config', () => {
 
   describe('with SuperJson transformer', () => {
     const serverWithSuperJson = setupServer(
-      mswTrpcWithSuperJson.listUsers.query(({ data, getInput }) => {
-        return data(getInput())
+      mswTrpcWithSuperJson.listUsers.query(users => {
+        return users
       }),
-      mswTrpcWithSuperJson.createFriend.mutation(async ({ data, getInput }) => {
-        const input = await getInput()
-        return data({ name: input.name, id: 'new-friend' })
+      mswTrpcWithSuperJson.createFriend.mutation(async ({ name }) => {
+        return { name, id: 'new-friend' }
       })
     )
 

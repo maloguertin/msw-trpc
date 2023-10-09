@@ -1,7 +1,9 @@
-import { AnyRouter, CombinedDataTransformer, defaultTransformer } from '@trpc/server'
+import { AnyRouter, CombinedDataTransformer, TRPCError, defaultTransformer } from '@trpc/server'
+import { getHTTPStatusCodeFromError } from '@trpc/server/http'
 
-import { HttpResponse, HttpResponseInit, http } from 'msw'
+import { HttpResponse, http } from 'msw'
 import { MswTrpc } from './types'
+import { TRPC_ERROR_CODES_BY_KEY } from '@trpc/server/rpc'
 
 const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
   const inputString = new URL(req.url).searchParams.get('input')
@@ -42,32 +44,35 @@ const createUntypedTRPCMsw = (
     {},
     {
       get(_target: unknown, procedureKey) {
-        if (procedureKey === 'query') {
+        if (procedureKey === 'query' || procedureKey === 'mutation') {
+          const getInput = procedureKey === 'query' ? getQueryInput : getMutationInput
           // @ts-expect-error any
           return handler =>
-            http.get(buildUrlFromPathParts(pathParts), params => {
-              return handler({
-                ...params,
-                getInput: () => getQueryInput(params.request, transformer),
-                // @ts-expect-error any
-                data: (body, init?: HttpResponseInit) =>
-                  HttpResponse.json({ result: { data: transformer.input.serialize(body) } }, init),
-              })
-            })
-        }
-
-        if (procedureKey === 'mutation') {
-          // @ts-expect-error any
-          return handler =>
-            http.post(buildUrlFromPathParts(pathParts), params => {
-              return handler({
-                ...params,
-                getInput: () => getMutationInput(params.request, transformer),
-                // @ts-expect-error any
-                data: (body, init?: HttpResponseInit) =>
-                  HttpResponse.json({ result: { data: transformer.input.serialize(body) } }, init),
-              })
-            })
+            (procedureKey === 'query' ? http.get : http.post)(
+              buildUrlFromPathParts(pathParts),
+              async (params): Promise<any> => {
+                try {
+                  const body = await handler(await getInput(params.request, transformer))
+                  return HttpResponse.json({ result: { data: transformer.input.serialize(body) } })
+                } catch (e) {
+                  if (e instanceof TRPCError) {
+                    const status = getHTTPStatusCodeFromError(e)
+                    return HttpResponse.json(
+                      {
+                        error: {
+                          message: e.message,
+                          code: TRPC_ERROR_CODES_BY_KEY[e.code],
+                          data: { code: e.code, httpStatus: status },
+                        },
+                      },
+                      { status }
+                    )
+                  } else {
+                    throw e
+                  }
+                }
+              }
+            )
         }
 
         const newPathParts =

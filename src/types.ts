@@ -1,5 +1,6 @@
 import { AnyRouter, BuildProcedure, Procedure, ProcedureParams, ProcedureType, inferRouterInputs } from '@trpc/server'
-import { DefaultBodyType, HttpResponse, HttpResponseInit, RequestHandler, ResponseResolver, StrictResponse } from 'msw'
+import { DefaultBodyType, RequestHandler } from 'msw'
+import { RequestHandlerDefaultInfo } from 'msw/lib/core/handlers/RequestHandler'
 
 export type ExtractKeys<T, K extends keyof T = keyof T> = T[K] extends
   | BuildProcedure<'query', any, any>
@@ -16,45 +17,24 @@ export type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<
 
 export type ExtractOutput<T> = T extends Procedure<ProcedureType, infer ProcedureParams>
   ? ProcedureParams['_output_out'] extends DefaultBodyType
-    ? { result: { data: ProcedureParams['_output_out'] } }
+    ? ProcedureParams['_output_out']
     : never
   : never
 
-export type TRPCResponse<T> = StrictResponse<ExtractOutput<T>>
-
-type WithDataHelper<T> = {
-  data: (
-    data: T extends Procedure<ProcedureType, infer ProcedureParams> ? ProcedureParams['_output_out'] : never,
-    init?: HttpResponseInit
-  ) => TRPCResponse<T>
-}
-
-export type WithQueryInput<T, K extends keyof T = keyof T> = {
-  getInput: () => T[K] extends BuildProcedure<any, any, any>
-    ? T extends AnyRouter
-      ? inferRouterInputs<T>[K]
-      : never
+export type WithInput<T, K extends keyof T = keyof T> = T[K] extends BuildProcedure<any, any, any>
+  ? T extends AnyRouter
+    ? inferRouterInputs<T>[K]
     : never
-}
+  : never
 
-export type WithMutationInput<T, K extends keyof T = keyof T> = {
-  getInput: () => T[K] extends BuildProcedure<any, any, any>
-    ? T extends AnyRouter
-      ? Promise<inferRouterInputs<T>[K]>
-      : never
-    : never
-}
+type PromiseOrValue<T> = T | Promise<T>
 
 export type SetQueryHandler<T, K extends keyof T> = (
-  handler: ResponseResolver<WithDataHelper<T[K]> & WithQueryInput<T, K>, DefaultBodyType, ExtractOutput<T[K]>>
+  handler: (input: WithInput<T, K>) => PromiseOrValue<ExtractOutput<T[K]>>
 ) => RequestHandler
 
 export type SetMutationHandler<T, K extends keyof T> = (
-  handler: ResponseResolver<
-    WithDataHelper<T[K]> & WithMutationInput<T, K>,
-    T[K] extends BuildProcedure<any, infer P, any> ? ExtractInput<P> : DefaultBodyType,
-    ExtractOutput<T[K]>
-  >
+  handler: (input: WithInput<T, K>) => PromiseOrValue<ExtractOutput<T[K]>>
 ) => RequestHandler
 
 export type Query<T, K extends keyof T> = {

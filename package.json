@@ -4,9 +4,6 @@
   "description": "Trpc API for Mock Service Worker (MSW).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "engines": {
-    "node": ">=18"
-  },
   "scripts": {
     "prepublish": "npm run build",
     "test": "tsc --noEmit && jest",

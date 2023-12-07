@@ -78,6 +78,47 @@ const appRouter = router({
 trpcMsw.user.list.query((req, res, ctx) => {})
 ```
 
+## Usage with @trpc/react-query
+
+To mock calls made by tRPC useQuery hooks, you can set up the test client as follows,
+making sure to pass in the 'fetch' property.
+
+```typescript
+import 'whatwg-fetch';
+// alternatively you could import { fetch } from 'cross-fetch'
+
+const trpcReact = createTRPCReact<AppRouter>();
+
+const trpcReactClient = trpcReact.createClient({
+  links: [httpLink({
+    url: 'http://localhost:3000/trpc',
+    fetch: fetch, // Important: specify the fetch implementation here
+  })]
+});
+```
+
+Then call setupServer() with a trpcMsw, as seen in the previous example.
+
+Then render your component, nested inside the providers.
+
+```typescript jsx
+import { render } from '@testing-library/react'
+
+const queryClient = new QueryClient();
+
+render(
+  <trpcReact.Provider client={trpcReactClient} queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <SomeComponentUnderTest />
+    </QueryClientProvider>
+  </trpcReact.Provider>
+);
+
+// Make assertions
+```
+
+For a full working example, see test/hooksIntegration.test.tsx.
+
 ## MSW Augments
 
 **ctx.data**

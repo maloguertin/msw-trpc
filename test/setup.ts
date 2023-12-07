@@ -4,6 +4,7 @@ import { createTRPCProxyClient, httpBatchLink, httpLink } from '@trpc/client'
 import superjson from 'superjson'
 
 import 'whatwg-fetch'
+import { createTRPCReact } from '@trpc/react-query'
 
 const t = initTRPC.create()
 const tWithSuperJson = initTRPC.create({
@@ -223,6 +224,20 @@ export const nestedTrpc = createTRPCProxyClient<NestedAppRouter>({
     }),
   ],
 })
+
+export const trpcReact = createTRPCReact<AppRouter>();
+
+export const trpcReactClient = trpcReact.createClient({
+  links: [httpLink({
+    url: 'http://localhost:3000/trpc',
+    fetch: fetch,
+    headers() {
+      return {
+        'content-type': 'application/json',
+      }
+    },
+  })],
+});
 
 export const mswTrpc = createTRPCMsw<AppRouter>()
 export const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()

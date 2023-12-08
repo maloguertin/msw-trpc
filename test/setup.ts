@@ -3,8 +3,6 @@ import { initTRPC } from '@trpc/server'
 import { createTRPCProxyClient, httpBatchLink, httpLink } from '@trpc/client'
 import superjson from 'superjson'
 
-import 'whatwg-fetch'
-
 const t = initTRPC.create()
 const tWithSuperJson = initTRPC.create({
   transformer: superjson,

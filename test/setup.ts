@@ -14,10 +14,47 @@ export interface User {
   id: string
   name: string
 }
+
+export interface Page {
+  id: string
+  posts: string[]
+}
+
+export interface Post {
+  id: string
+  title: string
+}
+
+export interface Reaction {
+  id: string
+  type: 'like' | 'dislike'
+}
+
 const userList: User[] = [
   {
     id: '1',
     name: 'KATT',
+  },
+]
+
+const pageList: Page[] = [
+  {
+    id: '1',
+    posts: [],
+  },
+]
+
+const postList: Post[] = [
+  {
+    id: '1',
+    title: 'My first post',
+  },
+]
+
+const reactionList: Reaction[] = [
+  {
+    id: '1',
+    type: 'like',
   },
 ]
 
@@ -175,6 +212,65 @@ const appRouterWithSuperJson = tWithSuperJson.router({
     }),
 })
 
+const pageRouter = t.router({
+  pageById: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .query(req => {
+      const { input } = req
+
+      const page = pageList.find(u => u.id === input)
+
+      return page
+    }),
+  createPage: t.procedure
+    .input((val: unknown) => {
+      return val as { posts: string[] }
+    })
+    .mutation(req => {
+      const { input } = req
+      return { id: 'new-page', posts: input.posts }
+    }),
+})
+
+const postRouter = t.router({
+  postById: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .query(req => {
+      const { input } = req
+
+      const post = postList.find(u => u.id === input)
+
+      return post
+    }),
+  createPost: t.procedure
+    .input((val: unknown) => {
+      return val as { title: string }
+    })
+    .mutation(req => {
+      const { input } = req
+      return { id: 'new-post', title: input.title }
+    }),
+})
+
+const reactionRouter = t.router({
+  addReaction: t.procedure
+    .input((val: unknown) => {
+      return val as { postId: string; type: Reaction['type'] }
+    })
+    .mutation(req => {
+      const { input } = req
+      return { id: 'new-reaction', type: input.type }
+    }),
+})
+
 export type AppRouter = typeof appRouter
 export type AppRouterWithSuperJson = typeof appRouterWithSuperJson
 
@@ -182,7 +278,14 @@ const nestedRouter = t.router({
   users: appRouter,
 })
 
+const nestedReactionsRouter = t.router({
+  reactions: reactionRouter,
+})
+
+const mergedAppRouter = t.mergeRouters(pageRouter, postRouter, nestedReactionsRouter)
+
 export type NestedAppRouter = typeof nestedRouter
+export type MergedAppRouter = typeof mergedAppRouter
 
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
@@ -224,9 +327,25 @@ export const nestedTrpc = createTRPCProxyClient<NestedAppRouter>({
   ],
 })
 
+export const mergedTrpc = createTRPCProxyClient<MergedAppRouter>({
+  links: [
+    httpLink({
+      url: 'http://localhost:3000/trpc',
+      headers() {
+        return {
+          'content-type': 'application/json',
+        }
+      },
+    }),
+  ],
+})
+
 export const mswTrpc = createTRPCMsw<AppRouter>()
-export const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()
 
 export const mswTrpcWithSuperJson = createTRPCMsw<AppRouterWithSuperJson>({
   transformer: { input: superjson, output: superjson },
 })
+
+export const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()
+
+export const mergedMswTrpc = createTRPCMsw<MergedAppRouter>()

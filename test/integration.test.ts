@@ -1,5 +1,7 @@
 import {
   AppRouter,
+  mergedMswTrpc,
+  mergedTrpc,
   mswTrpc,
   mswTrpcWithSuperJson,
   NestedAppRouter,
@@ -14,8 +16,9 @@ import { createTRPCMsw } from '../src'
 
 type MswTrpc = typeof mswTrpc
 type NestedMswTrpc = typeof nestedMswTrpc
+type MergedMswTrpc = typeof mergedMswTrpc
 
-const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
+const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc, mergedMswTrpc: MergedMswTrpc) => {
   return setupServer(
     mswTrpc.userById.query((req, res, ctx) => {
       return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo' }))
@@ -33,13 +36,29 @@ const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) 
       return res(ctx.status(200), ctx.data({ id: '1', name: 'Malo', posts: ['1'] }))
     }),
     nestedMswTrpc.users.createUser.mutation(async (req, res, ctx) => {
-      return res(ctx.status(200), ctx.data({ id: '2', name: await req.json() }))
+      return res(ctx.status(200), ctx.data({ id: '2', name: await req.getInput() }))
+    }),
+    mergedMswTrpc.pageById.query(async (req, res, ctx) => {
+      return res(ctx.status(200), ctx.data({ id: '1', posts: [] }))
+    }),
+    mergedMswTrpc.createPage.mutation(async (req, res, ctx) => {
+      return res(ctx.status(200), ctx.data({ id: '2', ...(await req.getInput()) }))
+    }),
+    mergedMswTrpc.postById.query(async (req, res, ctx) => {
+      return res(ctx.status(200), ctx.data({ id: '1', title: 'My first post' }))
+    }),
+    mergedMswTrpc.createPost.mutation(async (req, res, ctx) => {
+      return res(ctx.status(200), ctx.data({ id: '1', ...(await req.getInput()) }))
+    }),
+    mergedMswTrpc.reactions.addReaction.mutation(async (req, res, ctx) => {
+      const input = await req.getInput()
+      return res(ctx.status(200), ctx.data({ id: '1', type: input.type }))
     })
   )
 }
 
 describe('queries and mutations', () => {
-  const server = setupServerWithQueries(mswTrpc, nestedMswTrpc)
+  const server = setupServerWithQueries(mswTrpc, nestedMswTrpc, mergedMswTrpc)
 
   beforeAll(() => server.listen())
 
@@ -76,6 +95,26 @@ describe('queries and mutations', () => {
       expect(user).toEqual({ id: '2', name: 'Robert' })
     })
   })
+
+  describe('merged router', () => {
+    test('msw server setup from msw-trpc query handle should handle queries properly', async () => {
+      const post = await mergedTrpc.postById.query('1')
+
+      expect(post).toEqual({ id: '1', title: 'My first post' })
+    })
+
+    test('msw server setup from msw-trpc query handle should handle mutation on nested router properly', async () => {
+      const reaction = await mergedTrpc.reactions.addReaction.mutate({ postId: '1', type: 'dislike' })
+
+      expect(reaction).toEqual({ id: '1', type: 'dislike' })
+    })
+
+    test('msw server setup from msw-trpc query handle should handle mutations properly', async () => {
+      const page = await mergedTrpc.createPage.mutate({ posts: ['1'] })
+
+      expect(page).toEqual({ id: '2', posts: ['1'] })
+    })
+  })
 })
 
 describe('config', () => {
@@ -83,7 +122,7 @@ describe('config', () => {
     const mswTrpc = createTRPCMsw<AppRouter>({ baseUrl: 'http://localhost:3000/trpc' })
     const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ baseUrl: 'http://localhost:3000/trpc' })
 
-    const server = setupServerWithQueries(mswTrpc, nestedMswTrpc)
+    const server = setupServerWithQueries(mswTrpc, nestedMswTrpc, mergedMswTrpc)
 
     beforeAll(() => server.listen())
 

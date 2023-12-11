@@ -7,6 +7,9 @@
   <hr />
 </div>
 
+> [!WARNING]
+> You are looking at a pre-release version of msw-trpc, which adds support for msw v2. Documentation may be out of date and bugs might occur, use at your own risk
+
 ## **[tPRC](https://trpc.io/) support for [MSW](https://mswjs.io/)**
 
 - Create MSW handlers from your tRPC router.

@@ -1,18 +1,19 @@
-import { AnyRouter, CombinedDataTransformer, defaultTransformer } from '@trpc/server'
-import type { RestRequest } from 'msw'
+import { AnyRouter, CombinedDataTransformer, TRPCError, defaultTransformer } from '@trpc/server'
+import { getHTTPStatusCodeFromError } from '@trpc/server/http'
 
-import { rest } from 'msw'
+import { HttpResponse, http } from 'msw'
 import { MswTrpc } from './types'
+import { TRPC_ERROR_CODES_BY_KEY } from '@trpc/server/rpc'
 
-const getQueryInput = (req: RestRequest, transformer: CombinedDataTransformer) => {
-  const inputString = req.url.searchParams.get('input')
+const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
+  const inputString = new URL(req.url).searchParams.get('input')
 
   if (inputString == null) return inputString
 
   return transformer.input.deserialize(JSON.parse(inputString))
 }
 
-const getMutationInput = async (req: RestRequest, transformer: CombinedDataTransformer) => {
+const getMutationInput = async (req: Request, transformer: CombinedDataTransformer) => {
   const body = await req.json()
 
   return transformer.output.deserialize(body)
@@ -43,35 +44,35 @@ const createUntypedTRPCMsw = (
     {},
     {
       get(_target: unknown, procedureKey) {
-        if (procedureKey === 'query') {
+        if (procedureKey === 'query' || procedureKey === 'mutation') {
+          const getInput = procedureKey === 'query' ? getQueryInput : getMutationInput
           // @ts-expect-error any
           return handler =>
-            rest.get(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
-                getInput: () => getQueryInput(req, transformer),
-              })
-
-              return handler(augmentedReq, res, {
-                ...ctx,
-                // @ts-expect-error any
-                data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
-              })
-            })
-        }
-
-        if (procedureKey === 'mutation') {
-          // @ts-expect-error any
-          return handler =>
-            rest.post(buildUrlFromPathParts(pathParts), (req, res, ctx) => {
-              const augmentedReq = Object.assign(Object.create(Object.getPrototypeOf(req)), req, {
-                getInput: () => getMutationInput(req, transformer),
-              })
-              return handler(augmentedReq, res, {
-                ...ctx,
-                // @ts-expect-error any
-                data: body => ctx.json({ result: { data: transformer.input.serialize(body) } }),
-              })
-            })
+            (procedureKey === 'query' ? http.get : http.post)(
+              buildUrlFromPathParts(pathParts),
+              async (params): Promise<any> => {
+                try {
+                  const body = await handler(await getInput(params.request, transformer))
+                  return HttpResponse.json({ result: { data: transformer.input.serialize(body) } })
+                } catch (e) {
+                  if (e instanceof TRPCError) {
+                    const status = getHTTPStatusCodeFromError(e)
+                    return HttpResponse.json(
+                      {
+                        error: {
+                          message: e.message,
+                          code: TRPC_ERROR_CODES_BY_KEY[e.code],
+                          data: { code: e.code, httpStatus: status },
+                        },
+                      },
+                      { status }
+                    )
+                  } else {
+                    throw e
+                  }
+                }
+              }
+            )
         }
 
         const newPathParts =

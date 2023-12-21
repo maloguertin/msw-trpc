@@ -16,7 +16,7 @@ const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
 const getMutationInput = async (req: Request, transformer: CombinedDataTransformer) => {
   const body = await req.json()
 
-  return transformer.output.deserialize(body)
+  return transformer.input.deserialize(body)
 }
 
 const getRegexpAsString = (baseUrl: string | RegExp) => {
@@ -53,7 +53,7 @@ const createUntypedTRPCMsw = (
               async (params): Promise<any> => {
                 try {
                   const body = await handler(await getInput(params.request, transformer))
-                  return HttpResponse.json({ result: { data: transformer.input.serialize(body) } })
+                  return HttpResponse.json({ result: { data: transformer.output.serialize(body) } })
                 } catch (e) {
                   if (e instanceof TRPCError) {
                     const status = getHTTPStatusCodeFromError(e)

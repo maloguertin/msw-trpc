@@ -82,12 +82,100 @@ describe('queries and mutations', () => {
   test('throwing error works', async () => {
     server.use(
       mswTrpc.userById.query(() => {
-        throw new TRPCError({ code: 'BAD_REQUEST' })
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
       })
     )
-    await expect(async () => {
+
+    let error
+    try {
       await trpc.userById.query('1')
-    }).rejects.toThrow(new TRPCClientError('BAD_REQUEST'))
+    } catch (e) {
+      error = e
+    }
+    const clientError = error as TRPCClientError<any>
+
+    expect(clientError).toBeInstanceOf(TRPCClientError)
+    expect(clientError.message).toBe('Resource not found')
+    expect(clientError.data).toEqual({
+      code: 'NOT_FOUND',
+      httpStatus: 404,
+      path: 'userById',
+    })
+    expect(clientError.meta?.response).toBeInstanceOf(Response)
+    expect(clientError.meta?.responseJSON).toEqual({
+      error: {
+        message: 'Resource not found',
+        code: -32004,
+        data: clientError.data,
+      },
+    })
+    expect(clientError.shape).toEqual({
+      message: 'Resource not found',
+      code: -32004,
+      data: clientError.data,
+    })
+  })
+
+  test('throwing error with superjson works', async () => {
+    server.use(
+      mswTrpcWithSuperJson.userById.query(() => {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
+      })
+    )
+
+    let error
+    try {
+      await trpcWithSuperJson.userById.query('1')
+    } catch (e) {
+      error = e
+    }
+    const clientError = error as TRPCClientError<any>
+
+    expect(clientError).toBeInstanceOf(TRPCClientError)
+    expect(clientError.message).toBe('Resource not found')
+    expect(clientError.data).toEqual({
+      code: 'NOT_FOUND',
+      httpStatus: 404,
+      path: 'userById',
+    })
+    expect(clientError.meta?.response).toBeInstanceOf(Response)
+    expect(clientError.meta?.responseJSON).toEqual({
+      error: {
+        json: {
+          message: 'Resource not found',
+          code: -32004,
+          data: clientError.data,
+        },
+      },
+    })
+    expect(clientError.shape).toEqual({
+      message: 'Resource not found',
+      code: -32004,
+      data: clientError.data,
+    })
+  })
+
+  test('throwing error with nested router works', async () => {
+    server.use(
+      nestedMswTrpc.users.userById.query(() => {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
+      })
+    )
+
+    let error
+    try {
+      await nestedTrpc.users.userById.query('1')
+    } catch (e) {
+      error = e
+    }
+    const clientError = error as TRPCClientError<any>
+
+    expect(clientError).toBeInstanceOf(TRPCClientError)
+    expect(clientError.data).toEqual({
+      code: 'NOT_FOUND',
+      httpStatus: 404,
+      path: 'users.userById',
+    })
   })
 })
 

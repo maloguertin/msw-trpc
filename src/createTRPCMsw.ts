@@ -57,16 +57,13 @@ const createUntypedTRPCMsw = (
                 } catch (e) {
                   if (e instanceof TRPCError) {
                     const status = getHTTPStatusCodeFromError(e)
-                    return HttpResponse.json(
-                      {
-                        error: {
-                          message: e.message,
-                          code: TRPC_ERROR_CODES_BY_KEY[e.code],
-                          data: { code: e.code, httpStatus: status },
-                        },
-                      },
-                      { status }
-                    )
+                    const path = pathParts.slice(1).join('.')
+                    const error = {
+                      message: e.message,
+                      code: TRPC_ERROR_CODES_BY_KEY[e.code],
+                      data: { code: e.code, httpStatus: status, path },
+                    }
+                    return HttpResponse.json({ error: transformer.output.serialize(error) }, { status })
                   } else {
                     throw e
                   }

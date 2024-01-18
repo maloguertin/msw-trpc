@@ -16,10 +16,12 @@ export type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<
   : never
 
 export type ExtractOutput<T> = T extends Procedure<ProcedureType, infer ProcedureParams>
-  ? ProcedureParams['_output_out'] extends DefaultBodyType
+  ? ProcedureParams['_output_out'] extends void
+    ? void
+    : ProcedureParams['_output_out'] extends DefaultBodyType
     ? ProcedureParams['_output_out']
-    : void
-  : void
+    : never
+  : never
 
 export type WithInput<T, K extends keyof T = keyof T> = T[K] extends BuildProcedure<any, any, any>
   ? T extends AnyRouter

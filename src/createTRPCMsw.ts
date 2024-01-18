@@ -3,7 +3,7 @@ import { getHTTPStatusCodeFromError } from '@trpc/server/http'
 
 import { HttpResponse, http } from 'msw'
 import { MswTrpc } from './types'
-import { TRPC_ERROR_CODES_BY_KEY } from '@trpc/server/rpc'
+import { TRPC_ERROR_CODES_BY_KEY, TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
 
 const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
   const inputString = new URL(req.url).searchParams.get('input')
@@ -58,19 +58,17 @@ const createUntypedTRPCMsw = (
                   if (!(e instanceof Error)) {
                     throw e
                   }
-                  // We cannot use `instanceof TRPCError` here because it may be a different class
-                  // because of peer dependencies
-                  if (!(e.constructor.name === 'TRPCError')) {
+                  if (!('code' in e)) {
                     throw e
                   }
-                  const trpcError = e as TRPCError
 
-                  const status = getHTTPStatusCodeFromError(trpcError)
+                  const status = getHTTPStatusCodeFromError(e as TRPCError)
                   const path = pathParts.slice(1).join('.')
+                  const { name: _, ...otherErrorData } = e
                   const jsonError = {
-                    message: trpcError.message,
-                    code: TRPC_ERROR_CODES_BY_KEY[trpcError.code],
-                    data: { code: trpcError.code, httpStatus: status, path },
+                    message: e.message,
+                    code: TRPC_ERROR_CODES_BY_KEY[e.code as TRPC_ERROR_CODE_KEY],
+                    data: { ...otherErrorData, code: e.code, httpStatus: status, path },
                   }
                   return HttpResponse.json({ error: transformer.output.serialize(jsonError) }, { status })
                 }

@@ -13,6 +13,7 @@ import { setupServer } from 'msw/node'
 import { createTRPCMsw } from '../src'
 import { TRPCError } from '@trpc/server'
 import { TRPCClientError } from '@trpc/client'
+import { TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
 
 type MswTrpc = typeof mswTrpc
 type NestedMswTrpc = typeof nestedMswTrpc
@@ -151,6 +152,59 @@ describe('queries and mutations', () => {
     expect(clientError.shape).toEqual({
       message: 'Resource not found',
       code: -32004,
+      data: clientError.data,
+    })
+  })
+
+  test('throwing custom error works with custom properties', async () => {
+    class CustomError extends TRPCError {
+      constructor(
+        opts: {
+          message?: string
+          code: TRPC_ERROR_CODE_KEY
+          cause?: unknown
+        },
+        public validationError: unknown
+      ) {
+        super(opts)
+      }
+    }
+
+    server.use(
+      mswTrpc.userById.query(() => {
+        throw new CustomError({ code: 'UNPROCESSABLE_CONTENT', message: 'Validation failed' }, { code: 'invalid-uuid' })
+      })
+    )
+
+    let error
+    try {
+      await trpc.userById.query('1')
+    } catch (e) {
+      error = e
+    }
+    const clientError = error as TRPCClientError<any>
+
+    expect(clientError).toBeInstanceOf(TRPCClientError)
+    expect(clientError.message).toBe('Validation failed')
+    expect(clientError.data).toEqual({
+      code: 'UNPROCESSABLE_CONTENT',
+      httpStatus: 422,
+      path: 'userById',
+      validationError: {
+        code: 'invalid-uuid',
+      },
+    })
+    expect(clientError.meta?.response).toBeInstanceOf(Response)
+    expect(clientError.meta?.responseJSON).toEqual({
+      error: {
+        message: 'Validation failed',
+        code: -32022,
+        data: clientError.data,
+      },
+    })
+    expect(clientError.shape).toEqual({
+      message: 'Validation failed',
+      code: -32022,
       data: clientError.data,
     })
   })

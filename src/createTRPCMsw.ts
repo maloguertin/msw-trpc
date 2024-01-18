@@ -55,18 +55,24 @@ const createUntypedTRPCMsw = (
                   const body = await handler(await getInput(params.request, transformer))
                   return HttpResponse.json({ result: { data: transformer.output.serialize(body) } })
                 } catch (e) {
-                  if (e instanceof TRPCError) {
-                    const status = getHTTPStatusCodeFromError(e)
-                    const path = pathParts.slice(1).join('.')
-                    const error = {
-                      message: e.message,
-                      code: TRPC_ERROR_CODES_BY_KEY[e.code],
-                      data: { code: e.code, httpStatus: status, path },
-                    }
-                    return HttpResponse.json({ error: transformer.output.serialize(error) }, { status })
-                  } else {
+                  if (!(e instanceof Error)) {
                     throw e
                   }
+                  // We cannot use `instanceof TRPCError` here because it may be a different class
+                  // because of peer dependencies
+                  if (!(e.constructor.name === 'TRPCError')) {
+                    throw e
+                  }
+                  const trpcError = e as TRPCError
+
+                  const status = getHTTPStatusCodeFromError(trpcError)
+                  const path = pathParts.slice(1).join('.')
+                  const jsonError = {
+                    message: trpcError.message,
+                    code: TRPC_ERROR_CODES_BY_KEY[trpcError.code],
+                    data: { code: trpcError.code, httpStatus: status, path },
+                  }
+                  return HttpResponse.json({ error: transformer.output.serialize(jsonError) }, { status })
                 }
               }
             )

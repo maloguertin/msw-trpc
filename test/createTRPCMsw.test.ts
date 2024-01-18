@@ -16,6 +16,15 @@ describe('proxy returned by createMswTrpc', () => {
     >()
   })
 
+  it('should interpret procedure without return as void', () => {
+    mswTrpc.noReturn.mutation(input => {
+      return
+    })
+    expectTypeOf(mswTrpc.noReturn.mutation).toEqualTypeOf<
+      (handler: (input: void) => PromiseOrValue<void>) => RequestHandler
+    >
+  })
+
   describe('with merged routers', () => {
     it('should expose property query on properties that match TRPC query procedures', () => {
       expectTypeOf(nestedMswTrpc.users.userById.query).toEqualTypeOf<

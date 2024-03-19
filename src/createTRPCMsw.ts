@@ -16,7 +16,7 @@ const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
 const getMutationInput = async (req: Request, transformer: CombinedDataTransformer) => {
   const body = await req.json()
 
-  return transformer.output.deserialize(body)
+  return transformer.input.deserialize(body)
 }
 
 const getRegexpAsString = (baseUrl: string | RegExp) => {

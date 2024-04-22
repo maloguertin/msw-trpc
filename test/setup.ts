@@ -112,6 +112,7 @@ const appRouter = t.router({
 
       return input
     }),
+  noReturn: t.procedure.mutation(() => {}),
 })
 
 const appRouterWithSuperJson = tWithSuperJson.router({

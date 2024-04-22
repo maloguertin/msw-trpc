@@ -16,7 +16,9 @@ export type ExtractInput<T extends ProcedureParams> = T extends ProcedureParams<
   : never
 
 export type ExtractOutput<T> = T extends Procedure<ProcedureType, infer ProcedureParams>
-  ? ProcedureParams['_output_out'] extends DefaultBodyType
+  ? ProcedureParams['_output_out'] extends void
+    ? void
+    : ProcedureParams['_output_out'] extends DefaultBodyType
     ? ProcedureParams['_output_out']
     : never
   : never

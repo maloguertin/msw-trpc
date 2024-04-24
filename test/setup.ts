@@ -1,9 +1,10 @@
 import createTRPCMsw from '../src/createTRPCMsw'
 import { initTRPC } from '@trpc/server'
-import { createTRPCProxyClient, httpBatchLink, httpLink } from '@trpc/client'
+import { createTRPCClient, httpLink } from '@trpc/client'
 import superjson from 'superjson'
 
 const t = initTRPC.create()
+
 const tWithSuperJson = initTRPC.create({
   transformer: superjson,
 })
@@ -177,13 +178,11 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 export type AppRouter = typeof appRouter
 export type AppRouterWithSuperJson = typeof appRouterWithSuperJson
 
-const nestedRouter = t.router({
-  users: appRouter,
-})
+const nestedRouter = t.router({ deeply: { nested: appRouter }})
 
 export type NestedAppRouter = typeof nestedRouter
 
-export const trpc = createTRPCProxyClient<AppRouter>({
+export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpLink({
       url: 'http://localhost:3000/trpc',
@@ -196,11 +195,11 @@ export const trpc = createTRPCProxyClient<AppRouter>({
   ],
 })
 
-export const trpcWithSuperJson = createTRPCProxyClient<AppRouterWithSuperJson>({
-  transformer: superjson,
+export const trpcWithSuperJson = createTRPCClient<AppRouterWithSuperJson>({
   links: [
     httpLink({
       url: 'http://localhost:3000/trpc',
+      transformer: superjson,
       headers() {
         return {
           'content-type': 'application/json',
@@ -210,7 +209,7 @@ export const trpcWithSuperJson = createTRPCProxyClient<AppRouterWithSuperJson>({
   ],
 })
 
-export const nestedTrpc = createTRPCProxyClient<NestedAppRouter>({
+export const nestedTrpc = createTRPCClient<NestedAppRouter>({
   links: [
     httpLink({
       url: 'http://localhost:3000/trpc',

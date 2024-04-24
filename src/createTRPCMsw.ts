@@ -1,11 +1,12 @@
-import { AnyRouter, CombinedDataTransformer, TRPCError, defaultTransformer } from '@trpc/server'
+import { AnyTRPCRouter, TRPCCombinedDataTransformer, TRPCError } from '@trpc/server'
+import { defaultTransformer } from '@trpc/server/unstable-core-do-not-import'
 import { getHTTPStatusCodeFromError } from '@trpc/server/http'
 
 import { HttpResponse, http } from 'msw'
 import { MswTrpc } from './types'
 import { TRPC_ERROR_CODES_BY_KEY, TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
 
-const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
+const getQueryInput = (req: Request, transformer: TRPCCombinedDataTransformer) => {
   const inputString = new URL(req.url).searchParams.get('input')
 
   if (inputString == null) return inputString
@@ -13,7 +14,7 @@ const getQueryInput = (req: Request, transformer: CombinedDataTransformer) => {
   return transformer.input.deserialize(JSON.parse(inputString))
 }
 
-const getMutationInput = async (req: Request, transformer: CombinedDataTransformer) => {
+const getMutationInput = async (req: Request, transformer: TRPCCombinedDataTransformer) => {
   const body = await req.json()
 
   return transformer.input.deserialize(body)
@@ -37,7 +38,7 @@ const createUntypedTRPCMsw = (
     baseUrl,
     basePath = 'trpc',
     transformer = defaultTransformer,
-  }: { baseUrl?: string; basePath?: string; transformer?: CombinedDataTransformer } = {},
+  }: { baseUrl?: string; basePath?: string; transformer?: TRPCCombinedDataTransformer } = {},
   pathParts: string[] = []
 ) => {
   return new Proxy(
@@ -78,15 +79,14 @@ const createUntypedTRPCMsw = (
 
         const newPathParts =
           pathParts.length === 0 ? (baseUrl != null ? [baseUrl] : [`\/${basePath}` as string]) : pathParts
-
         return createUntypedTRPCMsw({ transformer }, [...newPathParts, procedureKey as string])
       },
     }
   )
 }
 
-const createTRPCMsw = <Router extends AnyRouter>(
-  config: { baseUrl?: string; basePath?: string; transformer?: CombinedDataTransformer } = {}
+const createTRPCMsw = <Router extends AnyTRPCRouter>(
+  config: { baseUrl?: string; basePath?: string; transformer?: TRPCCombinedDataTransformer } = {}
 ) => {
   return createUntypedTRPCMsw(config) as MswTrpc<Router>
 }

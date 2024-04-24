@@ -20,7 +20,7 @@ type NestedMswTrpc = typeof nestedMswTrpc
 
 const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
   return setupServer(
-    mswTrpc.userById.query(() => {
+    mswTrpc.userById.query((toto: string) => {
       return { id: '1', name: 'Malo' }
     }),
     mswTrpc.userByIdAndPost.query(() => {
@@ -29,13 +29,13 @@ const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) 
     mswTrpc.createUser.mutation(name => {
       return { id: '2', name }
     }),
-    nestedMswTrpc.users.userById.query(() => {
+    nestedMswTrpc.deeply.nested.userById.query(() => {
       return { id: '1', name: 'Malo' }
     }),
-    nestedMswTrpc.users.userByIdAndPost.query(() => {
+    nestedMswTrpc.deeply.nested.userByIdAndPost.query(() => {
       return { id: '1', name: 'Malo', posts: ['1'] }
     }),
-    nestedMswTrpc.users.createUser.mutation(name => {
+    nestedMswTrpc.deeply.nested.createUser.mutation(name => {
       return { id: '2', name }
     })
   )
@@ -62,19 +62,19 @@ describe('queries and mutations', () => {
 
   describe('nested router', () => {
     test('msw server setup from msw-trpc query handle should handle queries properly', async () => {
-      const user = await nestedTrpc.users.userById.query('1')
+      const user = await nestedTrpc.deeply.nested.userById.query('1')
 
       expect(user).toEqual({ id: '1', name: 'Malo' })
     })
 
     test('msw server setup from msw-trpc query handle should handle queries with same starting string properly', async () => {
-      const user = await nestedTrpc.users.userByIdAndPost.query('1')
+      const user = await nestedTrpc.deeply.nested.userByIdAndPost.query('1')
 
       expect(user).toEqual({ id: '1', name: 'Malo', posts: ['1'] })
     })
 
     test('msw server setup from msw-trpc query handle should handle mutations properly', async () => {
-      const user = await nestedTrpc.users.createUser.mutate('Robert')
+      const user = await nestedTrpc.deeply.nested.createUser.mutate('Robert')
 
       expect(user).toEqual({ id: '2', name: 'Robert' })
     })
@@ -211,14 +211,14 @@ describe('queries and mutations', () => {
 
   test('throwing error with nested router works', async () => {
     server.use(
-      nestedMswTrpc.users.userById.query(() => {
+      nestedMswTrpc.deeply.nested.userById.query(() => {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
       })
     )
 
     let error
     try {
-      await nestedTrpc.users.userById.query('1')
+      await nestedTrpc.deeply.nested.userById.query('1')
     } catch (e) {
       error = e
     }
@@ -228,7 +228,7 @@ describe('queries and mutations', () => {
     expect(clientError.data).toEqual({
       code: 'NOT_FOUND',
       httpStatus: 404,
-      path: 'users.userById',
+      path: 'deeply.nested.userById',
     })
   })
 })
@@ -258,19 +258,19 @@ describe('config', () => {
 
     describe('nested router', () => {
       test('msw server setup from msw-trpc query handle should handle queries properly', async () => {
-        const user = await nestedTrpc.users.userById.query('1')
+        const user = await nestedTrpc.deeply.nested.userById.query('1')
 
         expect(user).toEqual({ id: '1', name: 'Malo' })
       })
 
       test('msw server setup from msw-trpc query handle should handle queries with same starting string properly', async () => {
-        const user = await nestedTrpc.users.userByIdAndPost.query('1')
+        const user = await nestedTrpc.deeply.nested.userByIdAndPost.query('1')
 
         expect(user).toEqual({ id: '1', name: 'Malo', posts: ['1'] })
       })
 
       test('msw server setup from msw-trpc query handle should handle mutations properly', async () => {
-        const user = await nestedTrpc.users.createUser.mutate('Robert')
+        const user = await nestedTrpc.deeply.nested.createUser.mutate('Robert')
 
         expect(user).toEqual({ id: '2', name: 'Robert' })
       })

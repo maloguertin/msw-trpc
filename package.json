@@ -7,6 +7,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "test": "tsc --noEmit && jest",
+    "format": "prettier --write ./src/**/*.ts ./test/**/*.ts",
     "build": "rimraf dist && tsc -p tsconfig.build.json"
   },
   "repository": {
@@ -26,9 +27,9 @@
   },
   "homepage": "https://github.com/maloguertin/msw-trpc#readme",
   "devDependencies": {
-    "@trpc/client": "^10.44.1",
-    "@trpc/react-query": "^10.44.1",
-    "@trpc/server": "^10.44.1",
+    "@trpc/client": "11.0.0-rc.351",
+    "@trpc/react-query": "11.0.0-rc.351",
+    "@trpc/server": "11.0.0-rc.351",
     "@types/jest": "^29.2.6",
     "expect-type": "^0.15.0",
     "jest": "^29.3.1",
@@ -43,7 +44,7 @@
     "zod": "^3.22.4"
   },
   "peerDependencies": {
-    "@trpc/server": ">=10.9.0",
+    "@trpc/server": ">=11.0.0-rc.351",
     "msw": "^2.0.0"
   }
 }

@@ -27,7 +27,7 @@ describe('proxy returned by createMswTrpc', () => {
 
   describe('with merged routers', () => {
     it('should expose property query on properties that match TRPC query procedures', () => {
-      expectTypeOf(nestedMswTrpc.users.userById.query).toEqualTypeOf<
+      expectTypeOf(nestedMswTrpc.deeply.nested.userById.query).toEqualTypeOf<
         (handler: (input: string) => PromiseOrValue<User | undefined>) => RequestHandler
       >()
     })

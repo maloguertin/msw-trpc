@@ -1,4 +1,4 @@
-import { expectTypeOf } from 'expect-type'
+import { describe, it, expectTypeOf } from 'vitest'
 import { RequestHandler } from 'msw'
 import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
 

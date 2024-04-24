@@ -8,7 +8,7 @@ import {
   trpc,
   trpcWithSuperJson,
 } from './setup'
-
+import { describe, test, beforeAll, afterAll, expect } from 'vitest'
 import { setupServer } from 'msw/node'
 import { createTRPCMsw } from '../src'
 import { TRPCError } from '@trpc/server'
@@ -20,7 +20,7 @@ type NestedMswTrpc = typeof nestedMswTrpc
 
 const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
   return setupServer(
-    mswTrpc.userById.query((toto: string) => {
+    mswTrpc.userById.query(() => {
       return { id: '1', name: 'Malo' }
     }),
     mswTrpc.userByIdAndPost.query(() => {
@@ -37,7 +37,7 @@ const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) 
     }),
     nestedMswTrpc.deeply.nested.createUser.mutation(name => {
       return { id: '2', name }
-    })
+    }),
   )
 }
 
@@ -84,7 +84,7 @@ describe('queries and mutations', () => {
     server.use(
       mswTrpc.userById.query(() => {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-      })
+      }),
     )
 
     let error
@@ -121,7 +121,7 @@ describe('queries and mutations', () => {
     server.use(
       mswTrpcWithSuperJson.userById.query(() => {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-      })
+      }),
     )
 
     let error
@@ -164,7 +164,7 @@ describe('queries and mutations', () => {
           code: TRPC_ERROR_CODE_KEY
           cause?: unknown
         },
-        public validationError: unknown
+        public validationError: unknown,
       ) {
         super(opts)
       }
@@ -173,7 +173,7 @@ describe('queries and mutations', () => {
     server.use(
       mswTrpc.userById.query(() => {
         throw new CustomError({ code: 'UNPROCESSABLE_CONTENT', message: 'Validation failed' }, { code: 'invalid-uuid' })
-      })
+      }),
     )
 
     let error
@@ -213,7 +213,7 @@ describe('queries and mutations', () => {
     server.use(
       nestedMswTrpc.deeply.nested.userById.query(() => {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-      })
+      }),
     )
 
     let error
@@ -284,7 +284,7 @@ describe('config', () => {
       }),
       mswTrpcWithSuperJson.createFriend.mutation(async ({ name }) => {
         return { name, id: 'new-friend' }
-      })
+      }),
     )
 
     beforeAll(() => {

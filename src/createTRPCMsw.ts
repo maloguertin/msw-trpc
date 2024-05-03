@@ -4,9 +4,8 @@ import { getHTTPStatusCodeFromError } from '@trpc/server/http'
 
 import { HttpResponse, http, ws } from 'msw'
 import { MswTrpc, TRPCMswConfig } from './types'
-import { TRPC_ERROR_CODES_BY_KEY } from '@trpc/server/rpc'
+import { TRPC_ERROR_CODES_BY_KEY, TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
 import { Observable, Unsubscribable } from '@trpc/server/observable'
-import { getWSConnectionHandler } from '@trpc/server/adapters/ws'
 
 const getQueryInput = (req: Request, transformer: TRPCCombinedDataTransformer) => {
   const inputString = new URL(req.url).searchParams.get('input')
@@ -74,18 +73,23 @@ const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig = {})
                     const body = await handler(await getInput(params.request, transformer))
                     return HttpResponse.json({ result: { data: transformer.output.serialize(body) } })
                   } catch (e) {
-                    if (!(e instanceof Error)) {
-                      throw e
-                    }
-                    if (!('code' in e)) {
-                      throw e
-                    }
-
-                    const status = getHTTPStatusCodeFromError(e as TRPCError)
-                    const error = getSerializedTrpcError(e, pathParts.slice(1).join('.'), transformer)
-
-                    return HttpResponse.json({ error }, { status })
+                  if (!(e instanceof Error)) {
+                    throw e
                   }
+                  if (!('code' in e)) {
+                    throw e
+                  }
+
+                  const status = getHTTPStatusCodeFromError(e as TRPCError)
+                  const path = pathParts.slice(1).join('.')
+                  const { name: _, ...otherErrorData } = e
+                  const jsonError = {
+                    message: e.message,
+                    code: TRPC_ERROR_CODES_BY_KEY[e.code as TRPC_ERROR_CODE_KEY],
+                    data: { ...otherErrorData, code: e.code, httpStatus: status, path },
+                  }
+                  return HttpResponse.json({ error: transformer.output.serialize(jsonError) }, { status })
+                }
                 },
               )
           } else if (procedureKey === 'subscription') {

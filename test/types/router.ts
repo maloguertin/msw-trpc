@@ -1,15 +1,10 @@
-import createTRPCMsw from '../src/createTRPCMsw'
 import { initTRPC } from '@trpc/server'
-import { createTRPCClient, createWSClient, httpLink, splitLink, wsLink } from '@trpc/client'
 import superjson from 'superjson'
-import { LazyWebSocket } from './lazy-websocket'
 import { observable } from '@trpc/server/observable'
 
 const t = initTRPC.create()
 
-const tWithSuperJson = initTRPC.create({
-  transformer: superjson,
-})
+const tWithSuperJson = initTRPC.create({ transformer: superjson })
 
 export interface User {
   id: string
@@ -131,7 +126,7 @@ const appRouter = t.router({
 })
 
 const appRouterWithSuperJson = tWithSuperJson.router({
-  userById: t.procedure
+  userById: tWithSuperJson.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val
 
@@ -144,7 +139,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 
       return user
     }),
-  userByIdAndPost: t.procedure
+  userByIdAndPost: tWithSuperJson.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val
 
@@ -157,7 +152,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 
       return { ...user, posts: ['1'] }
     }),
-  createUser: t.procedure
+  createUser: tWithSuperJson.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val
 
@@ -171,7 +166,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
         name: input,
       } as User
     }),
-  listUsers: t.procedure
+  listUsers: tWithSuperJson.procedure
     .input((val: unknown) => {
       return val as { take: number; skip: number }
     })
@@ -179,7 +174,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
       const { input } = req
       return input
     }),
-  createFriend: t.procedure
+  createFriend: tWithSuperJson.procedure
     .input((val: unknown) => {
       return val as { name: string }
     })
@@ -187,68 +182,18 @@ const appRouterWithSuperJson = tWithSuperJson.router({
       const { input } = req
       return { id: 'new-user', name: input.name }
     }),
+  addDateToSet: tWithSuperJson.procedure
+    .input((val: unknown) => {
+      return val as Date
+    })
+    .mutation(req => {
+      const { input } = req
+      return new Set([input])
+    }),
 })
-
-export type AppRouter = typeof appRouter
-export type AppRouterWithSuperJson = typeof appRouterWithSuperJson
 
 const nestedRouter = t.router({ deeply: { nested: appRouter } })
 
+export type AppRouter = typeof appRouter
+export type AppRouterWithSuperJson = typeof appRouterWithSuperJson
 export type NestedAppRouter = typeof nestedRouter
-
-export const WEBSOCKET_URL = 'ws://localhost:3001'
-
-const getSplitLinks = (transformer?: boolean) => {
-  const base = transformer ? { transformer: superjson } : {}
-
-  return [
-    splitLink({
-      condition: op => {
-        console.log(op)
-        return op.type === 'subscription'
-      },
-      true: wsLink({
-        client: createWSClient({
-          url: WEBSOCKET_URL,
-          WebSocket: LazyWebSocket as any,
-          /* onOpen() {
-            console.log('WS OPEN')
-          },
-          onClose() {
-            console.log('WS CLOSE')
-          }, */
-        }),
-
-        ...base,
-      }),
-      false: httpLink({
-        url: 'http://localhost:3000/trpc',
-        headers() {
-          return {
-            'content-type': 'application/json',
-          }
-        },
-        ...base,
-      }),
-    }),
-  ]
-}
-
-export const mswTrpc = createTRPCMsw<AppRouter>()
-export const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()
-
-export const mswTrpcWithSuperJson = createTRPCMsw<AppRouterWithSuperJson>({
-  transformer: { input: superjson, output: superjson },
-})
-
-export const trpc = createTRPCClient<AppRouter>({
-  links: getSplitLinks(),
-})
-
-export const trpcWithSuperJson = createTRPCClient<AppRouterWithSuperJson>({
-  links: getSplitLinks(true),
-})
-
-export const nestedTrpc = createTRPCClient<NestedAppRouter>({
-  links: getSplitLinks(),
-})

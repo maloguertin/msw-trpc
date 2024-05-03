@@ -1,9 +1,17 @@
 import { describe, it, expectTypeOf } from 'vitest'
 import { RequestHandler, WebSocketHandler } from 'msw'
-import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
+import type { AppRouter, AppRouterWithSuperJson, NestedAppRouter, User } from './router'
 import { Observable } from '@trpc/server/observable'
+import createTRPCMsw from '../../src/createTRPCMsw'
+import superjson from 'superjson'
 
 type PromiseOrValue<T> = T | Promise<T>
+
+const mswTrpc = createTRPCMsw<AppRouter>()
+const nestedMswTrpc = createTRPCMsw<NestedAppRouter>()
+const mswTrpcWithSuperJson = createTRPCMsw<AppRouterWithSuperJson>({
+  transformer: { input: superjson, output: superjson },
+})
 
 describe('proxy returned by createMswTrpc', () => {
   it('should expose property query on properties that match TRPC query procedures', () => {
@@ -51,6 +59,12 @@ describe('proxy returned by createMswTrpc', () => {
     it('req.getInput should return the correct type', () => {
       expectTypeOf(mswTrpcWithSuperJson.userById.query).toEqualTypeOf<
         (handler: (input: string) => PromiseOrValue<User | undefined>) => RequestHandler
+      >()
+    })
+
+    it('req.getOutput should return the correct type', () => {
+      expectTypeOf(mswTrpcWithSuperJson.addDateToSet.mutation).toEqualTypeOf<
+        (handler: (input: Date) => PromiseOrValue<Set<Date>>) => RequestHandler
       >()
     })
   })

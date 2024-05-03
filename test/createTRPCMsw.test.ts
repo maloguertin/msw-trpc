@@ -1,8 +1,10 @@
 import { describe, it, expectTypeOf } from 'vitest'
-import { RequestHandler } from 'msw'
+import { RequestHandler, WebSocketHandler } from 'msw'
 import { mswTrpc, mswTrpcWithSuperJson, nestedMswTrpc, User } from './setup'
+import { Observable } from '@trpc/server/observable'
 
 type PromiseOrValue<T> = T | Promise<T>
+
 describe('proxy returned by createMswTrpc', () => {
   it('should expose property query on properties that match TRPC query procedures', () => {
     expectTypeOf(mswTrpc.userById.query).toEqualTypeOf<
@@ -13,6 +15,12 @@ describe('proxy returned by createMswTrpc', () => {
   it('should expose property mutation on properties that match TRPC mutation procedures', () => {
     expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
       (handler: (input: string) => PromiseOrValue<User>) => RequestHandler
+    >()
+  })
+
+  it('should expose property subscription on properties that match TRPC subscription procedures', () => {
+    expectTypeOf(mswTrpc.getUserUpdates.subscription).toEqualTypeOf<
+      (handler: (input: string) => Observable<User, unknown>) => WebSocketHandler
     >()
   })
 

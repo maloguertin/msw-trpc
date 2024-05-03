@@ -7,13 +7,16 @@ import {
   nestedTrpc,
   trpc,
   trpcWithSuperJson,
+  User,
+  WEBSOCKET_URL,
 } from './setup'
-import { describe, test, beforeAll, afterAll, expect } from 'vitest'
+import { describe, test, beforeAll, afterAll, expect, afterEach } from 'vitest'
 import { setupServer } from 'msw/node'
 import { createTRPCMsw } from '../src'
 import { TRPCError } from '@trpc/server'
 import { TRPCClientError } from '@trpc/client'
 import { TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
+import { observable } from '@trpc/server/observable'
 
 type MswTrpc = typeof mswTrpc
 type NestedMswTrpc = typeof nestedMswTrpc
@@ -37,6 +40,23 @@ const setupServerWithQueries = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) 
     }),
     nestedMswTrpc.deeply.nested.createUser.mutation(name => {
       return { id: '2', name }
+    }),
+  )
+}
+
+const setupServerWithSubscriptions = (mswTrpc: MswTrpc, nestedMswTrpc: NestedMswTrpc) => {
+  return setupServer(
+    mswTrpc.getUserUpdates.subscription(id => {
+      return observable(emit => {
+        setTimeout(() => {
+          emit.next({ id, name: 'Toto' })
+        }, 3000)
+      })
+    }),
+    nestedMswTrpc.deeply.nested.getUserUpdates.subscription(id => {
+      return observable(emit => {
+        emit.next({ id, name: 'Tutu' })
+      })
     }),
   )
 }
@@ -230,6 +250,62 @@ describe('queries and mutations', () => {
       httpStatus: 404,
       path: 'deeply.nested.userById',
     })
+  })
+})
+
+describe.only('subscriptions', () => {
+  const mswTrpc = createTRPCMsw<AppRouter>({ wsUrl: WEBSOCKET_URL })
+  const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ wsUrl: WEBSOCKET_URL })
+
+  const server = setupServerWithSubscriptions(mswTrpc, nestedMswTrpc)
+
+  beforeAll(() =>
+    server.listen({
+      onUnhandledRequest: 'error',
+    }),
+  )
+
+  // afterEach(() => server.resetHandlers())
+
+  afterAll(() => server.close())
+
+  test.only('msw server setup from msw-trpc should handle subscriptions properly', async () => {
+    const promise = new Promise<User>(resolve => {
+      trpc.getUserUpdates.subscribe('21', {
+        onData(data) {
+          console.log('received', data)
+          resolve(data)
+        },
+      })
+    })
+
+    await expect(promise).resolves.toEqual({ id: '21', name: 'Toto' })
+  })
+
+  test('msw server setup from msw-trpc should handle nested subscriptions properly', async () => {
+    const promise = new Promise<User>(resolve => {
+      nestedTrpc.deeply.nested.getUserUpdates.subscribe('5', {
+        onData(data) {
+          console.log('received', data)
+          resolve(data)
+        },
+      })
+    })
+
+    await expect(promise).resolves.toEqual({ id: '5', name: 'Tutu' })
+  })
+
+  test.skip('msw server setup from msw-trpc should handle subscriptions with delayed data properly', async () => {
+    const promise = new Promise<User>(resolve => {
+      trpc.getUserUpdates.subscribe('21', {
+        onData(data) {
+          console.log('received', data)
+          resolve(data)
+        },
+      })
+    })
+
+    await expect(promise).resolves.toEqual({ id: '21', name: 'Toto' })
   })
 })
 

@@ -53,15 +53,15 @@ describe('with ws link', () => {
     })
 
     test('handles subscriptions properly', async () => {
-      server.use(
-        mswTrpc.getUserUpdates.subscription(id => {
-          return observable(emit => {
-            setTimeout(() => {
-              emit.next({ id, name: 'Toto' })
-            }, 1000)
-          })
-        }),
-      )
+      const subscription = mswTrpc.getUserUpdates.subscription(id => {
+        return observable(emit => {
+          setTimeout(() => {
+            emit.next({ id, name: 'Toto' })
+          }, 1000)
+        })
+      })
+
+      server.use(subscription.handler)
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
 
@@ -75,19 +75,19 @@ describe('with ws link', () => {
     })
 
     test('can receive multiple subscription updates', async () => {
-      server.use(
-        mswTrpc.getUserUpdates.subscription(id => {
-          return observable(emit => {
-            const names = ['Toto', 'Tutu', 'Titi']
+      const subscription = mswTrpc.getUserUpdates.subscription(id => {
+        return observable(emit => {
+          const names = ['Toto', 'Tutu', 'Titi']
 
-            names.forEach((name, i) => {
-              setTimeout(() => {
-                emit.next({ id, name })
-              }, i * 50)
-            })
+          names.forEach((name, i) => {
+            setTimeout(() => {
+              emit.next({ id, name })
+            }, i * 50)
           })
-        }),
-      )
+        })
+      })
+
+      server.use(subscription.handler)
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
 
@@ -108,6 +108,31 @@ describe('with ws link', () => {
         { id: '4', name: 'Tutu' },
         { id: '4', name: 'Titi' },
       ])
+    })
+
+    test('can trigger subscription data', async () => {
+      const subscription = mswTrpc.getUserUpdates.subscription(id => {
+        return observable(() => {})
+      })
+
+      server.use(subscription.handler)
+
+      const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
+
+      const startedPromise = new Promise<{ data: Promise<User> }>(resolveStarted => {
+        const dataPromise = new Promise<User>(resolveData => {
+          trpc.getUserUpdates.subscribe('5', {
+            onData: resolveData,
+            onStarted: () => resolveStarted({ data: dataPromise }),
+          })
+        })
+      })
+
+      const { data: dataPromise } = await startedPromise
+
+      subscription.trigger({ id: '5', name: 'Didier' })
+
+      await expect(dataPromise).resolves.toEqual({ id: '5', name: 'Didier' })
     })
   })
 
@@ -135,15 +160,15 @@ describe('with ws link', () => {
     })
 
     test('handles subscriptions properly', async () => {
-      server.use(
-        mswTrpc.deeply.nested.getUserUpdates.subscription(id => {
-          return observable(emit => {
-            setTimeout(() => {
-              emit.next({ id, name: 'Tutu' })
-            }, 1000)
-          })
-        }),
-      )
+      const subscription = mswTrpc.deeply.nested.getUserUpdates.subscription(id => {
+        return observable(emit => {
+          setTimeout(() => {
+            emit.next({ id, name: 'Tutu' })
+          }, 1000)
+        })
+      })
+
+      server.use(subscription.handler)
 
       const trpc = createTRPCClient<NestedAppRouter>({ links: createLinks() })
 

@@ -37,10 +37,13 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
                 handler: (
                   input: inferProcedureInput<$Value>,
                 ) => Observable<inferTransformedProcedureOutputOrVoid<TRouter, $Value>, unknown>,
-              ) => WebSocketHandler
+              ) => {
+                handler: WebSocketHandler
+                trigger: (data: inferTransformedProcedureOutputOrVoid<TRouter, $Value>) => void
+              }
             }
           : {
-              [K in 'query' | 'mutation']: (
+              [K in `${$Value['_def']['type']}`]: (
                 handler: (
                   input: inferProcedureInput<$Value>,
                 ) => PromiseOrValue<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>,

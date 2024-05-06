@@ -96,61 +96,86 @@ const createTrpcHandler = (
           return HttpResponse.json({ error: transformer.output.serialize(jsonError) }, { status })
         }
       })
-    } else if (procedureType === 'subscription') {
-      throw new Error('Subscriptions require a WebSocket link (wsLink)')
     }
+
+    throw new Error('Subscriptions require a WebSocket link (wsLink)')
   } else if (handlerType === 'ws') {
     const wsLink = wsLinks.get(url) ?? wsLinks.set(url, ws.link(url)).get(url)!
     const clients = new Map<string, Map<number | string, Unsubscribable>>()
 
-    return wsLink.on('connection', ({ client }) => {
-      if (!clients.has(client.id)) {
-        clients.set(client.id, new Map())
-      }
+    let innerTrigger: (input: unknown) => void
 
-      const clientSubscriptions = clients.get(client.id)!
-
-      client.addEventListener('message', async event => {
-        const message = JSON.parse(event.data.toString()) as {
-          id: number | string
-          jsonrpc?: '2.0'
-          method: 'query' | 'mutation' | 'subscription'
-          params: {
-            path: string
-            input?: unknown
-          }
+    return {
+      handler: wsLink.on('connection', ({ client }) => {
+        if (!clients.has(client.id)) {
+          clients.set(client.id, new Map())
         }
 
-        try {
-          if (message.params.path === path) {
-            const input = transformer.input.deserialize(message.params.input)
+        const clientSubscriptions = clients.get(client.id)!
 
-            if (message.method === 'subscription') {
-              const observable = handler(input) as Observable<unknown, unknown>
+        client.addEventListener('message', async event => {
+          const message = JSON.parse(event.data.toString()) as {
+            id: number | string
+            jsonrpc?: '2.0'
+            method: 'query' | 'mutation' | 'subscription'
+            params: {
+              path: string
+              input?: unknown
+            }
+          }
 
-              const sub = observable.subscribe({
-                next(data) {
-                  client.send(
-                    JSON.stringify({
-                      id: message.id,
-                      jsonrpc: message.jsonrpc,
-                      result: {
-                        type: 'data',
-                        data: transformer.output.serialize(data),
-                      },
-                    }),
-                  )
-                },
-                error(e) {
-                  client.send(
-                    JSON.stringify({
-                      id: message.id,
-                      jsonrpc: message.jsonrpc,
-                      error: getSerializedTrpcError(e, path, transformer),
-                    }),
-                  )
-                },
-                complete() {
+          try {
+            if (message.params.path === path) {
+              const input = transformer.input.deserialize(message.params.input)
+
+              if (message.method === 'subscription') {
+                const observable = handler(input) as Observable<unknown, unknown>
+
+                const sub = observable.subscribe({
+                  next(data) {
+                    client.send(
+                      JSON.stringify({
+                        id: message.id,
+                        jsonrpc: message.jsonrpc,
+                        result: {
+                          type: 'data',
+                          data: transformer.output.serialize(data),
+                        },
+                      }),
+                    )
+                  },
+                  error(e) {
+                    client.send(
+                      JSON.stringify({
+                        id: message.id,
+                        jsonrpc: message.jsonrpc,
+                        error: getSerializedTrpcError(e, path, transformer),
+                      }),
+                    )
+                  },
+                  complete() {
+                    sub.unsubscribe()
+
+                    client.send(
+                      JSON.stringify({
+                        id: message.id,
+                        jsonrpc: message.jsonrpc,
+                        result: {
+                          type: 'stopped',
+                        },
+                      }),
+                    )
+
+                    clientSubscriptions.delete(message.id)
+                  },
+                })
+
+                if (client.socket.readyState !== WebSocket.OPEN) {
+                  sub.unsubscribe()
+                  return
+                }
+
+                if (clientSubscriptions.has(message.id)) {
                   sub.unsubscribe()
 
                   client.send(
@@ -163,81 +188,81 @@ const createTrpcHandler = (
                     }),
                   )
 
-                  clientSubscriptions.delete(message.id)
-                },
-              })
+                  throw new TRPCError({
+                    message: `Duplicate id ${message.id}`,
+                    code: 'BAD_REQUEST',
+                  })
+                }
 
-              if (client.socket.readyState !== WebSocket.OPEN) {
-                sub.unsubscribe()
-                return
-              }
+                clientSubscriptions.set(message.id, sub)
 
-              if (clientSubscriptions.has(message.id)) {
-                sub.unsubscribe()
+                innerTrigger = input =>
+                  client.send(
+                    JSON.stringify({
+                      id: message.id,
+                      jsonrpc: message.jsonrpc,
+                      result: {
+                        type: 'data',
+                        data: transformer.output.serialize(input),
+                      },
+                    }),
+                  )
 
                 client.send(
                   JSON.stringify({
                     id: message.id,
                     jsonrpc: message.jsonrpc,
                     result: {
-                      type: 'stopped',
+                      type: 'started',
                     },
                   }),
                 )
+              } else {
+                const result = await handler(input)
 
-                throw new TRPCError({
-                  message: `Duplicate id ${message.id}`,
-                  code: 'BAD_REQUEST',
-                })
+                client.send(
+                  JSON.stringify({
+                    id: message.id,
+                    jsonrpc: message.jsonrpc,
+                    result: {
+                      type: 'data',
+                      data: transformer.output.serialize(result),
+                    },
+                  }),
+                )
               }
-
-              clientSubscriptions.set(message.id, sub)
-
-              client.send(
-                JSON.stringify({
-                  id: message.id,
-                  jsonrpc: message.jsonrpc,
-                  result: {
-                    type: 'started',
-                  },
-                }),
-              )
-            } else {
-              const result = await handler(input)
-
-              client.send(
-                JSON.stringify({
-                  id: message.id,
-                  jsonrpc: message.jsonrpc,
-                  result: {
-                    type: 'data',
-                    data: transformer.output.serialize(result),
-                  },
-                }),
-              )
             }
+          } catch (e) {
+            client.send(
+              JSON.stringify({
+                id: message.id,
+                jsonrpc: message.jsonrpc,
+                error: getSerializedTrpcError(e, path),
+              }),
+            )
           }
-        } catch (e) {
-          client.send(
-            JSON.stringify({
-              id: message.id,
-              jsonrpc: message.jsonrpc,
-              error: getSerializedTrpcError(e, path),
-            }),
-          )
-        }
-      })
+        })
 
-      client.addEventListener(
-        'close',
-        () => {
-          clientSubscriptions.forEach(sub => sub.unsubscribe())
-          clients.delete(client.id)
-        },
-        { once: true },
-      )
-    })
+        client.addEventListener(
+          'close',
+          () => {
+            clientSubscriptions.forEach(sub => sub.unsubscribe())
+            clients.delete(client.id)
+          },
+          { once: true },
+        )
+      }),
+      trigger: (input: unknown) => {
+        if (!innerTrigger) {
+          throw new Error('Subscription not started')
+        }
+
+        innerTrigger(input)
+      },
+    }
   }
+
+  throw new Error('Unknown handler type')
 }
 
 export const trpc = {

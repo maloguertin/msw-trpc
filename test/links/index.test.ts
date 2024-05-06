@@ -53,7 +53,7 @@ describe('building handlers based on trpc links', () => {
       expect(
         mswTrpc.getUserUpdates.subscription(id => {
           return observable(emit => emit.next({ id, name: 'Toto' }))
-        }),
+        }).handler,
       ).toBeInstanceOf(WebSocketHandler)
     })
 
@@ -99,7 +99,7 @@ describe('building handlers based on trpc links', () => {
         expect(
           mswTrpc.getUserUpdates.subscription(id => {
             return observable(emit => emit.next({ id, name: 'Toto' }))
-          }),
+          }).handler,
         ).toBeInstanceOf(WebSocketHandler)
       })
 
@@ -113,7 +113,7 @@ describe('building handlers based on trpc links', () => {
         expect(
           nestedMswTrpc.deeply.nested.getUserUpdates.subscription(id => {
             return observable(emit => emit.next({ id, name: 'Toto' }))
-          }),
+          }).handler,
         ).toBeInstanceOf(WebSocketHandler)
       })
     })
@@ -147,7 +147,7 @@ describe('building handlers based on trpc links', () => {
         expect(
           mswTrpc.getUserUpdates.subscription(id => {
             return observable(emit => emit.next({ id, name: 'Toto' }))
-          }),
+          }).handler,
         ).toBeInstanceOf(WebSocketHandler)
       })
 
@@ -183,7 +183,7 @@ describe('building handlers based on trpc links', () => {
         expect(
           nestedMswTrpc.deeply.nested.getUserUpdates.subscription(id => {
             return observable(emit => emit.next({ id, name: 'Toto' }))
-          }),
+          }).handler,
         ).toBeInstanceOf(WebSocketHandler)
       })
     })

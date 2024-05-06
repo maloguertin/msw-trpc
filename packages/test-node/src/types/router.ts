@@ -25,10 +25,10 @@ const appRouter = t.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.id === input)
+      const user = userList.find((u) => u.id === input)
 
       return user
     }),
@@ -38,10 +38,10 @@ const appRouter = t.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.id === input)
+      const user = userList.find((u) => u.id === input)
 
       return { ...user, posts: ['1'] }
     }),
@@ -63,10 +63,10 @@ const appRouter = t.router({
       }
       return val as User
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.name === input)
+      const user = userList.find((u) => u.name === input)
 
       return user
     }),
@@ -76,7 +76,7 @@ const appRouter = t.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
 
       return {
@@ -106,7 +106,7 @@ const appRouter = t.router({
       }
       return val as User
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
 
       return input
@@ -119,7 +119,7 @@ const appRouter = t.router({
       throw new Error(`Invalid input: ${typeof val}`)
     })
     .subscription(() => {
-      return observable<User>(emit => {
+      return observable<User>((emit) => {
         emit.next({ id: '1', name: 'KATT' })
       })
     }),
@@ -132,10 +132,10 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.id === input)
+      const user = userList.find((u) => u.id === input)
 
       return user
     }),
@@ -145,10 +145,10 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.id === input)
+      const user = userList.find((u) => u.id === input)
 
       return { ...user, posts: ['1'] }
     }),
@@ -158,7 +158,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
 
       return {
@@ -170,7 +170,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
     .input((val: unknown) => {
       return val as { take: number; skip: number }
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
       return input
     }),
@@ -178,7 +178,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
     .input((val: unknown) => {
       return val as { name: string }
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
       return { id: 'new-user', name: input.name }
     }),
@@ -186,7 +186,7 @@ const appRouterWithSuperJson = tWithSuperJson.router({
     .input((val: unknown) => {
       return val as Date
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
       return new Set([input])
     }),

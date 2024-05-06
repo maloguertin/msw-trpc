@@ -1,7 +1,7 @@
 import { initTRPC } from '@trpc/server'
-import { observable } from '@trpc/server/observable'
+import superjson from 'superjson'
 
-const t = initTRPC.create()
+const t = initTRPC.create({ transformer: superjson })
 
 export interface User {
   id: string
@@ -15,17 +15,17 @@ const userList: User[] = [
   },
 ]
 
-const appRouter = t.router({
+const router = t.router({
   userById: t.procedure
     .input((val: unknown) => {
       if (typeof val === 'string') return val
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .query(req => {
+    .query((req) => {
       const { input } = req
 
-      const user = userList.find(u => u.id === input)
+      const user = userList.find((u) => u.id === input)
 
       return user
     }),
@@ -35,7 +35,7 @@ const appRouter = t.router({
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .mutation(req => {
+    .mutation((req) => {
       const { input } = req
 
       return {
@@ -43,20 +43,17 @@ const appRouter = t.router({
         name: input,
       } as User
     }),
-  getUserUpdates: t.procedure
+  superjson: t.procedure
     .input((val: unknown) => {
-      if (typeof val === 'string') return val
+      if (val instanceof Date) return val
 
       throw new Error(`Invalid input: ${typeof val}`)
     })
-    .subscription(() => {
-      return observable<User>(emit => {
-        emit.next({ id: '3', name: 'Marie' })
-      })
+    .query((req) => {
+      const { input } = req
+
+      return new Set([input])
     }),
 })
 
-const nestedRouter = t.router({ deeply: { nested: appRouter } })
-
-export type NestedAppRouter = typeof nestedRouter
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof router

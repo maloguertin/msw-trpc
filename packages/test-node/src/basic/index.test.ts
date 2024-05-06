@@ -5,10 +5,10 @@ import { TRPC_ERROR_CODE_KEY } from '@trpc/server/rpc'
 import { setupServer } from 'msw/node'
 import { describe, test, beforeAll, afterAll, expect, afterEach } from 'vitest'
 
-import { links } from './links'
-import { AppRouter, NestedAppRouter } from '../routers'
-import createTRPCMsw from '../../src/createTRPCMsw'
-import { httpLink } from '../../src/links'
+import { links } from './links.js'
+import { AppRouter, NestedAppRouter } from '../routers.js'
+import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { httpLink } from '../../../msw-trpc/src/links.js'
 
 const mswLinks = [
   httpLink({
@@ -40,7 +40,7 @@ describe('with http link', () => {
     })
 
     test('handle mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation(name => ({ id: '2', name })))
+      server.use(mswTrpc.createUser.mutation((name) => ({ id: '2', name })))
 
       const user = await trpc.createUser.mutate('Robert')
 
@@ -51,7 +51,7 @@ describe('with http link', () => {
       server.use(
         mswTrpc.userById.query(() => {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-        }),
+        })
       )
 
       await expect(trpc.userById.query('1')).rejects.toMatchObject({
@@ -83,7 +83,7 @@ describe('with http link', () => {
             code: TRPC_ERROR_CODE_KEY
             cause?: unknown
           },
-          public validationError: unknown,
+          public validationError: unknown
         ) {
           super(opts)
         }
@@ -93,9 +93,9 @@ describe('with http link', () => {
         mswTrpc.userById.query(() => {
           throw new CustomError(
             { code: 'UNPROCESSABLE_CONTENT', message: 'Validation failed' },
-            { code: 'invalid-uuid' },
+            { code: 'invalid-uuid' }
           )
-        }),
+        })
       )
 
       await expect(trpc.userById.query('1')).rejects.toMatchObject({
@@ -158,7 +158,7 @@ describe('with http link', () => {
     })
 
     test('mutations properly', async () => {
-      server.use(mswTrpc.deeply.nested.createUser.mutation(name => ({ id: '2', name })))
+      server.use(mswTrpc.deeply.nested.createUser.mutation((name) => ({ id: '2', name })))
       const user = await trpc.deeply.nested.createUser.mutate('Robert')
 
       expect(user).toEqual({ id: '2', name: 'Robert' })
@@ -168,7 +168,7 @@ describe('with http link', () => {
       server.use(
         mswTrpc.deeply.nested.userById.query(() => {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-        }),
+        })
       )
 
       await expect(trpc.deeply.nested.userById.query('1')).rejects.toMatchObject({

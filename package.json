@@ -1,49 +1,31 @@
 {
-  "name": "msw-trpc",
-  "version": "2.0.0-beta.1",
-  "description": "Trpc API for Mock Service Worker (MSW).",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "tsc --noEmit && vitest --run",
-    "build": "rimraf dist && tsc -p tsconfig.build.json"
+    "format": "prettier --write .",
+    "type-check": "pnpm --filter \"./packages/**\" type-check",
+    "test": "pnpm --filter \"./packages/**\" test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/maloguertin/msw-trpc.git"
-  },
-  "keywords": [
-    "msw",
-    "trpc",
-    "testing",
-    "api"
-  ],
-  "author": "Malo Guertin",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/maloguertin/msw-trpc/issues"
-  },
-  "homepage": "https://github.com/maloguertin/msw-trpc#readme",
   "devDependencies": {
-    "@trpc/client": "11.0.0-rc.351",
-    "@trpc/react-query": "11.0.0-rc.351",
-    "@trpc/server": "11.0.0-rc.351",
-    "@types/ws": "^8.5.10",
-    "@vitest/browser": "^1.5.3",
-    "msw": "2.3.0-ws.rc-6",
-    "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
-    "superjson": "^2.2.1",
-    "typescript": "^5.4.5",
-    "undici": "^6.15.0",
-    "vitest": "^1.5.1",
-    "webdriverio": "^8.36.1",
-    "ws": "^8.17.0",
-    "zod": "^3.23.4"
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
+    "@types/ws": "8.5.10",
+    "lint-staged": "15.2.2",
+    "prettier": "3.2.5",
+    "rimraf": "5.0.5",
+    "simple-git-hooks": "2.11.1",
+    "typescript": "5.4.5",
+    "vitest": "1.6.0"
   },
-  "peerDependencies": {
-    "@trpc/server": ">=11.0.0-rc.351",
-    "msw": "2.3.0-ws.rc-6"
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
   }
 }

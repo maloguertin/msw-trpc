@@ -1,6 +1,6 @@
 import { createWSClient, wsLink } from '@trpc/client'
 
-import { LazyWebSocket } from '../lazy-websocket'
+import { LazyWebSocket } from '../lazy-websocket.js'
 
 export const createLinks = () => [
   wsLink({

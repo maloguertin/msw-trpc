@@ -4,10 +4,10 @@ import { observable } from '@trpc/server/observable'
 import { setupServer } from 'msw/node'
 import { describe, test, beforeAll, afterAll, expect, afterEach } from 'vitest'
 
-import { createLinks } from './links'
-import { AppRouter, NestedAppRouter, User } from '../routers'
-import createTRPCMsw from '../../src/createTRPCMsw'
-import { createWSClient, wsLink } from '../../src/links'
+import { createLinks } from './links.js'
+import { AppRouter, NestedAppRouter, User } from '../routers.js'
+import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { createWSClient, wsLink } from '../../../msw-trpc/src/links.js'
 
 const mswLinks = [
   wsLink({
@@ -38,7 +38,7 @@ describe('with ws link', () => {
     })
 
     test('handles mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation(name => ({ id: '2', name })))
+      server.use(mswTrpc.createUser.mutation((name) => ({ id: '2', name })))
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
       const user = await trpc.createUser.mutate('Robert')
@@ -47,8 +47,8 @@ describe('with ws link', () => {
     })
 
     test('handles subscriptions properly', async () => {
-      const subscription = mswTrpc.getUserUpdates.subscription(id => {
-        return observable(emit => {
+      const subscription = mswTrpc.getUserUpdates.subscription((id) => {
+        return observable((emit) => {
           setTimeout(() => {
             emit.next({ id, name: 'Toto' })
           }, 1000)
@@ -59,7 +59,7 @@ describe('with ws link', () => {
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
 
-      const promise = new Promise<User>(resolve => {
+      const promise = new Promise<User>((resolve) => {
         trpc.getUserUpdates.subscribe('3', {
           onData: resolve,
         })
@@ -69,8 +69,8 @@ describe('with ws link', () => {
     })
 
     test('can receive multiple subscription updates', async () => {
-      const subscription = mswTrpc.getUserUpdates.subscription(id => {
-        return observable(emit => {
+      const subscription = mswTrpc.getUserUpdates.subscription((id) => {
+        return observable((emit) => {
           const names = ['Toto', 'Tutu', 'Titi']
 
           names.forEach((name, i) => {
@@ -85,10 +85,10 @@ describe('with ws link', () => {
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
 
-      const promise = new Promise<User[]>(resolve => {
+      const promise = new Promise<User[]>((resolve) => {
         const results: User[] = []
         trpc.getUserUpdates.subscribe('4', {
-          onData: data => {
+          onData: (data) => {
             results.push(data)
             if (results.length === 3) {
               resolve(results)
@@ -111,8 +111,8 @@ describe('with ws link', () => {
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
 
-      const startedPromise = new Promise<{ data: Promise<User> }>(resolveStarted => {
-        const dataPromise = new Promise<User>(resolveData => {
+      const startedPromise = new Promise<{ data: Promise<User> }>((resolveStarted) => {
+        const dataPromise = new Promise<User>((resolveData) => {
           trpc.getUserUpdates.subscribe('5', {
             onData: resolveData,
             onStarted: () => resolveStarted({ data: dataPromise }),
@@ -143,7 +143,7 @@ describe('with ws link', () => {
     })
 
     test('handles mutations properly', async () => {
-      server.use(mswTrpc.deeply.nested.createUser.mutation(name => ({ id: '2', name })))
+      server.use(mswTrpc.deeply.nested.createUser.mutation((name) => ({ id: '2', name })))
 
       const trpc = createTRPCClient<NestedAppRouter>({ links: createLinks() })
       const user = await trpc.deeply.nested.createUser.mutate('Robert')
@@ -152,8 +152,8 @@ describe('with ws link', () => {
     })
 
     test('handles subscriptions properly', async () => {
-      const subscription = mswTrpc.deeply.nested.getUserUpdates.subscription(id => {
-        return observable(emit => {
+      const subscription = mswTrpc.deeply.nested.getUserUpdates.subscription((id) => {
+        return observable((emit) => {
           setTimeout(() => {
             emit.next({ id, name: 'Tutu' })
           }, 1000)
@@ -164,7 +164,7 @@ describe('with ws link', () => {
 
       const trpc = createTRPCClient<NestedAppRouter>({ links: createLinks() })
 
-      const promise = new Promise<User>(resolve => {
+      const promise = new Promise<User>((resolve) => {
         trpc.deeply.nested.getUserUpdates.subscribe('21', {
           onData: resolve,
         })

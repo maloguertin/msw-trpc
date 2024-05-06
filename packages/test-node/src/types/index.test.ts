@@ -4,9 +4,9 @@ import { RequestHandler, WebSocketHandler } from 'msw'
 import { describe, expectTypeOf, test } from 'vitest'
 import superjson from 'superjson'
 
-import { AppRouter, AppRouterWithSuperJson, NestedAppRouter, User } from './router'
-import createTRPCMsw from '../../src/createTRPCMsw'
-import { httpLink } from '../../src/links'
+import { AppRouter, AppRouterWithSuperJson, NestedAppRouter, User } from './router.js'
+import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { httpLink } from '../../../msw-trpc/src/links.js'
 
 type PromiseOrValue<T> = T | Promise<T>
 
@@ -48,7 +48,7 @@ describe('proxy returned by createMswTrpc', () => {
   })
 
   test('should interpret procedure without return as void', () => {
-    mswTrpc.noReturn.mutation(input => {
+    mswTrpc.noReturn.mutation((input) => {
       return
     })
     expectTypeOf(mswTrpc.noReturn.mutation).toEqualTypeOf<

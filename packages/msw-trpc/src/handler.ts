@@ -1,5 +1,5 @@
 import { http, HttpResponse, WebSocketLink, ws } from 'msw'
-import { Link } from './links'
+import { Link } from './links.js'
 import { TRPCCombinedDataTransformer, TRPCError, getTRPCErrorFromUnknown } from '@trpc/server'
 import {
   TRPC_ERROR_CODES_BY_KEY,
@@ -8,7 +8,7 @@ import {
   getHTTPStatusCodeFromError,
 } from '@trpc/server/unstable-core-do-not-import'
 import { Observable, Unsubscribable, observable } from '@trpc/server/observable'
-import { TRPCMswConfig } from './types'
+import { TRPCMswConfig } from './types.js'
 
 const getQueryInput = (req: Request, transformer: TRPCCombinedDataTransformer) => {
   const inputString = new URL(req.url).searchParams.get('input')
@@ -54,7 +54,7 @@ const createTrpcHandler = (
     // Only support a single link for now
     links: Link[]
     transformer?: TRPCCombinedDataTransformer
-  },
+  }
 ) => {
   const [link] = links
 
@@ -77,7 +77,7 @@ const createTrpcHandler = (
 
       const urlRegex = new RegExp(`${url}/${path.replace('.', '[/.|.]')}$`)
 
-      return httpHandler(urlRegex, async params => {
+      return httpHandler(urlRegex, async (params) => {
         try {
           const input = await getInput(params.request, transformer)
           const body = await handler!(input) // TS doesn't seem to understand that handler is defined here, despite the check above
@@ -117,7 +117,8 @@ const createTrpcHandler = (
 
         const clientSubscriptions = clients.get(client.id)!
 
-        client.addEventListener('message', async event => {
+        client.addEventListener('message', async (event) => {
+          // @ts-ignore Wrong type for event ?
           const message = JSON.parse(event.data.toString()) as {
             id: number | string
             jsonrpc?: '2.0'
@@ -146,7 +147,7 @@ const createTrpcHandler = (
                           type: 'data',
                           data: transformer.output.serialize(data),
                         },
-                      }),
+                      })
                     )
                   },
                   error(e) {
@@ -155,7 +156,7 @@ const createTrpcHandler = (
                         id: message.id,
                         jsonrpc: message.jsonrpc,
                         error: getSerializedTrpcError(e, path, transformer),
-                      }),
+                      })
                     )
                   },
                   complete() {
@@ -168,14 +169,15 @@ const createTrpcHandler = (
                         result: {
                           type: 'stopped',
                         },
-                      }),
+                      })
                     )
 
                     clientSubscriptions.delete(message.id)
                   },
                 })
 
-                if (client.socket.readyState !== WebSocket.OPEN) {
+                // WebSocket.OPEN = 1
+                if (client.socket.readyState !== 1) {
                   sub.unsubscribe()
                   return
                 }
@@ -190,7 +192,7 @@ const createTrpcHandler = (
                       result: {
                         type: 'stopped',
                       },
-                    }),
+                    })
                   )
 
                   throw new TRPCError({
@@ -201,7 +203,7 @@ const createTrpcHandler = (
 
                 clientSubscriptions.set(message.id, sub)
 
-                innerTrigger = input =>
+                innerTrigger = (input) =>
                   client.send(
                     JSON.stringify({
                       id: message.id,
@@ -210,7 +212,7 @@ const createTrpcHandler = (
                         type: 'data',
                         data: transformer.output.serialize(input),
                       },
-                    }),
+                    })
                   )
 
                 client.send(
@@ -220,7 +222,7 @@ const createTrpcHandler = (
                     result: {
                       type: 'started',
                     },
-                  }),
+                  })
                 )
               } else {
                 const result = await handler!(input) // TS doesn't seem to understand that handler is defined here, despite the check above
@@ -233,7 +235,7 @@ const createTrpcHandler = (
                       type: 'data',
                       data: transformer.output.serialize(result),
                     },
-                  }),
+                  })
                 )
               }
             }
@@ -243,7 +245,7 @@ const createTrpcHandler = (
                 id: message.id,
                 jsonrpc: message.jsonrpc,
                 error: getSerializedTrpcError(e, path),
-              }),
+              })
             )
           }
         })
@@ -251,10 +253,10 @@ const createTrpcHandler = (
         client.addEventListener(
           'close',
           () => {
-            clientSubscriptions.forEach(sub => sub.unsubscribe())
+            clientSubscriptions.forEach((sub) => sub.unsubscribe())
             clients.delete(client.id)
           },
-          { once: true },
+          { once: true }
         )
       }),
       trigger: (input: unknown) => {

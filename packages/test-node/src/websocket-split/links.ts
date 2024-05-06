@@ -1,10 +1,10 @@
 import { createWSClient, httpLink, splitLink, wsLink } from '@trpc/client'
 
-import { LazyWebSocket } from '../lazy-websocket'
+import { LazyWebSocket } from '../lazy-websocket.js'
 
 export const createLinks = () => [
   splitLink({
-    condition: op => op.type === 'subscription',
+    condition: (op) => op.type === 'subscription',
     true: wsLink({
       client: createWSClient({
         url: 'ws://localhost:3001',

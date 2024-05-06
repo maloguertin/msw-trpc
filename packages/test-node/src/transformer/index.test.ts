@@ -5,10 +5,10 @@ import { setupServer } from 'msw/node'
 import { describe, test, beforeAll, afterAll, expect, afterEach } from 'vitest'
 import superjson from 'superjson'
 
-import { links } from './links'
-import { AppRouter } from './router'
-import createTRPCMsw from '../../src/createTRPCMsw'
-import { httpLink } from '../../src/links'
+import { links } from './links.js'
+import { AppRouter } from './router.js'
+import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { httpLink } from '../../../msw-trpc/src/links.js'
 
 const mswLinks = [
   httpLink({
@@ -42,7 +42,7 @@ describe('with http link and superjson transformer', () => {
     })
 
     test('handle mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation(name => ({ id: '2', name })))
+      server.use(mswTrpc.createUser.mutation((name) => ({ id: '2', name })))
 
       const user = await trpc.createUser.mutate('Robert')
 
@@ -53,7 +53,7 @@ describe('with http link and superjson transformer', () => {
       server.use(
         mswTrpc.userById.query(() => {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Resource not found' })
-        }),
+        })
       )
 
       await expect(trpc.userById.query('1')).rejects.toMatchObject({
@@ -81,9 +81,9 @@ describe('with http link and superjson transformer', () => {
 
     test('superjson transformer works', async () => {
       server.use(
-        mswTrpc.superjson.query(date => {
+        mswTrpc.superjson.query((date) => {
           return new Set([date])
-        }),
+        })
       )
 
       const date = new Date()

@@ -1,8 +1,8 @@
 import { AnyTRPCRouter } from '@trpc/server'
 
-import { MswTrpc, TRPCMswConfig } from './types'
+import { MswTrpc, TRPCMswConfig } from './types.js'
 
-import { trpc } from './handler'
+import { trpc } from './handler.js'
 import { HttpHandler } from 'msw'
 
 const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig) => {
@@ -34,7 +34,7 @@ const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig) => {
 
           return createUntypedTRPCMsw([...pathParts, lastKey as string])
         },
-      },
+      }
     )
   }
 

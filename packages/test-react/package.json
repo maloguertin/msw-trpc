@@ -1,0 +1,23 @@
+{
+  "name": "@msw-trpc/test-react",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "5.35.1",
+    "@testing-library/jest-dom": "6.4.5",
+    "@testing-library/react": "15.0.6",
+    "@trpc/client": "11.0.0-rc.364",
+    "@trpc/react-query": "11.0.0-rc.364",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
+    "jsdom": "24.0.0",
+    "msw": "2.3.0-ws.rc-6",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

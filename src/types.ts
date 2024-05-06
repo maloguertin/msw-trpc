@@ -8,13 +8,12 @@ import type {
 } from '@trpc/server'
 import { Observable } from '@trpc/server/observable'
 import type { RequestHandler, WebSocketHandler } from 'msw'
+import { Link } from './links'
 
 type PromiseOrValue<T> = T | Promise<T>
 
 export interface TRPCMswConfig {
-  baseUrl?: string
-  basePath?: string
-  wsUrl?: string
+  links: Link[]
   transformer?: TRPCCombinedDataTransformer
 }
 

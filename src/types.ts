@@ -34,7 +34,7 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
         ? $Value['_def']['type'] extends 'subscription'
           ? {
               subscription: (
-                handler: (
+                handler?: (
                   input: inferProcedureInput<$Value>,
                 ) => Observable<inferTransformedProcedureOutputOrVoid<TRouter, $Value>, unknown>,
               ) => {

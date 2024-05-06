@@ -1,4 +1,4 @@
-import { RequestHandler, HttpHandler, WebSocketHandler, http, HttpResponse, WebSocketLink, ws } from 'msw'
+import { http, HttpResponse, WebSocketLink, ws } from 'msw'
 import { Link } from './links'
 import { TRPCCombinedDataTransformer, TRPCError, getTRPCErrorFromUnknown } from '@trpc/server'
 import {
@@ -7,7 +7,7 @@ import {
   defaultTransformer,
   getHTTPStatusCodeFromError,
 } from '@trpc/server/unstable-core-do-not-import'
-import { Observable, Unsubscribable } from '@trpc/server/observable'
+import { Observable, Unsubscribable, observable } from '@trpc/server/observable'
 import { TRPCMswConfig } from './types'
 
 const getQueryInput = (req: Request, transformer: TRPCCombinedDataTransformer) => {
@@ -46,7 +46,7 @@ const wsLinks = new Map<string, WebSocketLink>()
 const createTrpcHandler = (
   procedureType: 'query' | 'mutation' | 'subscription',
   path: string,
-  handler: Function,
+  handler: Function | undefined,
   {
     links,
     transformer = defaultTransformer,
@@ -66,6 +66,10 @@ const createTrpcHandler = (
 
   const { type: handlerType, url } = link({ type: procedureType, path })
 
+  if (!handler && (procedureType === 'query' || procedureType === 'mutation')) {
+    throw new Error('Handler is required for query and mutation procedures')
+  }
+
   if (handlerType === 'http') {
     if (procedureType === 'query' || procedureType === 'mutation') {
       const getInput = procedureType === 'query' ? getQueryInput : getMutationInput
@@ -76,7 +80,7 @@ const createTrpcHandler = (
       return httpHandler(urlRegex, async params => {
         try {
           const input = await getInput(params.request, transformer)
-          const body = await handler(input)
+          const body = await handler!(input) // TS doesn't seem to understand that handler is defined here, despite the check above
           return HttpResponse.json({ result: { data: transformer.output.serialize(body) } })
         } catch (e) {
           if (!(e instanceof Error)) {
@@ -129,9 +133,10 @@ const createTrpcHandler = (
               const input = transformer.input.deserialize(message.params.input)
 
               if (message.method === 'subscription') {
-                const observable = handler(input) as Observable<unknown, unknown>
+                // Default to an observable that does nothing, in case we want a subscription that only sends data on trigger
+                const obs = (handler?.(input) as Observable<unknown, unknown>) ?? observable(() => {})
 
-                const sub = observable.subscribe({
+                const sub = obs.subscribe({
                   next(data) {
                     client.send(
                       JSON.stringify({
@@ -218,7 +223,7 @@ const createTrpcHandler = (
                   }),
                 )
               } else {
-                const result = await handler(input)
+                const result = await handler!(input) // TS doesn't seem to understand that handler is defined here, despite the check above
 
                 client.send(
                   JSON.stringify({
@@ -269,6 +274,6 @@ export const trpc = {
   query: (path: string, handler: Function, opts: TRPCMswConfig) => createTrpcHandler('query', path, handler, opts),
   mutation: (path: string, handler: Function, opts: TRPCMswConfig) =>
     createTrpcHandler('mutation', path, handler, opts),
-  subscription: (path: string, handler: Function, opts: TRPCMswConfig) =>
+  subscription: (path: string, handler: Function | undefined, opts: TRPCMswConfig) =>
     createTrpcHandler('subscription', path, handler, opts),
 }

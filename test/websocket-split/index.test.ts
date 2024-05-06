@@ -111,9 +111,7 @@ describe('with ws link', () => {
     })
 
     test('can trigger subscription data', async () => {
-      const subscription = mswTrpc.getUserUpdates.subscription(id => {
-        return observable(() => {})
-      })
+      const subscription = mswTrpc.getUserUpdates.subscription()
 
       server.use(subscription.handler)
 

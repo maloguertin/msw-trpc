@@ -40,7 +40,7 @@ describe('proxy returned by createMswTrpc', () => {
 
   test('should expose property subscription on properties that match TRPC subscription procedures', () => {
     expectTypeOf(mswTrpc.getUserUpdates.subscription).toEqualTypeOf<
-      (handler: (input: string) => Observable<User, unknown>) => {
+      (handler?: (input: string) => Observable<User, unknown>) => {
         handler: WebSocketHandler
         trigger: (data: User) => void
       }

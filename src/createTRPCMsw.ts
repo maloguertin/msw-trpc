@@ -3,7 +3,7 @@ import { AnyTRPCRouter } from '@trpc/server'
 import { MswTrpc, TRPCMswConfig } from './types'
 
 import { trpc } from './handler'
-import { HttpHandler, WebSocketHandler } from 'msw'
+import { HttpHandler } from 'msw'
 
 const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig) => {
   const { links, transformer } = config
@@ -14,8 +14,8 @@ const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig) => {
       {},
       {
         get(target: unknown, lastKey) {
-          if (lastKey === 'query' || lastKey === 'mutation' || lastKey === 'subscription') {
-            const procedurePath = pathParts.join('.')
+          const procedurePath = pathParts.join('.')
+          if (lastKey === 'query' || lastKey === 'mutation') {
             return (handler: Function) => {
               const result = trpc[lastKey](procedurePath, handler, { links, transformer })
 
@@ -23,11 +23,12 @@ const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfig) => {
                 return result
               }
 
-              if (lastKey === 'subscription') {
-                return result
-              }
-
               return result.handler
+            }
+          } else if (lastKey === 'subscription') {
+            return (handler?: Function) => {
+              const result = trpc[lastKey](procedurePath, handler, { links, transformer })
+              return result
             }
           }
 

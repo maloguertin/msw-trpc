@@ -10,9 +10,9 @@
   "devDependencies": {
     "@tanstack/react-query": "5.35.1",
     "@testing-library/jest-dom": "6.4.5",
-    "@testing-library/react": "15.0.6",
-    "@trpc/client": "11.0.0-rc.364",
-    "@trpc/react-query": "11.0.0-rc.364",
+    "@testing-library/react": "15.0.7",
+    "@trpc/client": "11.0.0-rc.366",
+    "@trpc/react-query": "11.0.0-rc.366",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0",
     "jsdom": "24.0.0",

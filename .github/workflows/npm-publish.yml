@@ -19,13 +19,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
+          node-version: 20
 
-      - run: npm ci
+      - uses: pnpm/action-setup@v3
 
-      - run: npm run build
+      - run: pnpm test
 
-      - run: npm publish
+      - run: |
+          cd packages/my-package
+          pnpm build
+          pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}

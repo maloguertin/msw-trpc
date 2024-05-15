@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@types/react':
-        specifier: 18.3.1
-        version: 18.3.1
+        specifier: 18.3.2
+        version: 18.3.2
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -24,8 +24,8 @@ importers:
         specifier: 3.2.5
         version: 3.2.5
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       simple-git-hooks:
         specifier: 2.11.1
         version: 2.11.1
@@ -34,17 +34,16 @@ importers:
         version: 5.4.5
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.11)(jsdom@24.0.0)
+        version: 1.6.0(@types/node@20.12.12)(jsdom@24.0.0)
 
   packages/msw-trpc:
     dependencies:
-      '@trpc/server':
-        specifier: '>=11.0.0-rc.364'
-        version: 11.0.0-rc.366
-    devDependencies:
       '@trpc/client':
-        specifier: 11.0.0-rc.366
-        version: 11.0.0-rc.366(@trpc/server@11.0.0-rc.366)
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370(@trpc/server@11.0.0-rc.370)
+      '@trpc/server':
+        specifier: '>=11.0.0-rc.370'
+        version: 11.0.0-rc.370
       msw:
         specifier: 2.3.0-ws.rc-6
         version: 2.3.0-ws.rc-6(typescript@5.4.5)
@@ -52,11 +51,11 @@ importers:
   packages/test-node:
     devDependencies:
       '@trpc/client':
-        specifier: 11.0.0-rc.366
-        version: 11.0.0-rc.366(@trpc/server@11.0.0-rc.366)
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370(@trpc/server@11.0.0-rc.370)
       '@trpc/server':
-        specifier: 11.0.0-rc.366
-        version: 11.0.0-rc.366
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370
       msw:
         specifier: 2.3.0-ws.rc-6
         version: 2.3.0-ws.rc-6(typescript@5.4.5)
@@ -64,29 +63,32 @@ importers:
         specifier: 2.2.1
         version: 2.2.1
       undici:
-        specifier: 6.16.0
-        version: 6.16.0
+        specifier: 6.16.1
+        version: 6.16.1
 
   packages/test-react:
     devDependencies:
       '@tanstack/react-query':
-        specifier: 5.35.1
-        version: 5.35.1(react@18.3.1)
+        specifier: 5.36.0
+        version: 5.36.0(react@18.3.1)
       '@testing-library/jest-dom':
         specifier: 6.4.5
-        version: 6.4.5(vitest@1.6.0(@types/node@20.12.11)(jsdom@24.0.0))
+        version: 6.4.5(vitest@1.6.0(@types/node@20.12.12)(jsdom@24.0.0))
       '@testing-library/react':
         specifier: 15.0.7
-        version: 15.0.7(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.0.7(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@trpc/client':
-        specifier: 11.0.0-rc.366
-        version: 11.0.0-rc.366(@trpc/server@11.0.0-rc.366)
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370(@trpc/server@11.0.0-rc.370)
       '@trpc/react-query':
-        specifier: 11.0.0-rc.366
-        version: 11.0.0-rc.366(@tanstack/react-query@5.35.1(react@18.3.1))(@trpc/client@11.0.0-rc.366(@trpc/server@11.0.0-rc.366))(@trpc/server@11.0.0-rc.366)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370(@tanstack/react-query@5.36.0(react@18.3.1))(@trpc/client@11.0.0-rc.370(@trpc/server@11.0.0-rc.370))(@trpc/server@11.0.0-rc.370)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@trpc/server':
+        specifier: 11.0.0-rc.370
+        version: 11.0.0-rc.370
       '@types/react':
-        specifier: 18.3.1
-        version: 18.3.1
+        specifier: 18.3.2
+        version: 18.3.2
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -102,6 +104,9 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
+      superjson:
+        specifier: 2.2.1
+        version: 2.2.1
 
 packages:
 
@@ -399,11 +404,11 @@ packages:
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
-  '@tanstack/query-core@5.35.1':
-    resolution: {integrity: sha512-0Dnpybqb8+ps6WgqBnqFEC+1F/xLvUosRAq+wiGisTgolOZzqZfkE2995dEXmhuzINiTM7/a6xSGznU0NIvBkw==}
+  '@tanstack/query-core@5.36.0':
+    resolution: {integrity: sha512-B5BD3pg/mztDR36i77hGcyySKKeYrbM5mnogOROTBi1SUml5ByRK7PGUUl16vvubvQC+mSnqziFG/VIy/DE3FQ==}
 
-  '@tanstack/react-query@5.35.1':
-    resolution: {integrity: sha512-i2T7m2ffQdNqlX3pO+uMsnQ0H4a59Ens2GxtlMsRiOvdSB4SfYmHb27MnvFV8rGmtWRaa4gPli0/rpDoSS5LbQ==}
+  '@tanstack/react-query@5.36.0':
+    resolution: {integrity: sha512-BATvtM0rohwg7pRHUnxgeDiwLWRGZ8OM/4y8LImHVpecQWoH6Uhytu3Z8YV6V7hQ1sMQBFcUrGE1/e4MxR6YiA==}
     peerDependencies:
       react: ^18.0.0
 
@@ -443,22 +448,22 @@ packages:
       '@types/react':
         optional: true
 
-  '@trpc/client@11.0.0-rc.366':
-    resolution: {integrity: sha512-bIbcF/UhCifU5i9hbbaMlmOS2NgnRq5W0pJH2SJhrp6jyIIaCF+uNAIZtkfO0GriBb0agBmGIXqvGLFEexiTKA==}
+  '@trpc/client@11.0.0-rc.370':
+    resolution: {integrity: sha512-3s3NuJ1wwIod96a2BEXwmCacROfeMnUOhBa9pi/ksQzrr0KkFXeJWsLcHwL8XmZRZ93scPLnX7I7jGTW2ol68w==}
     peerDependencies:
-      '@trpc/server': 11.0.0-rc.366+237dbb3f9
+      '@trpc/server': 11.0.0-rc.370+1a920ac81
 
-  '@trpc/react-query@11.0.0-rc.366':
-    resolution: {integrity: sha512-LCdJFymEdaKBBNRQPVAcEw9qNu3m+n9hH3qIPKDanLWYlo4h+8lQnj8JIhYpClD2G3gkvD0ZSZ+F54QvwrI3nA==}
+  '@trpc/react-query@11.0.0-rc.370':
+    resolution: {integrity: sha512-DGPJdBsjtshHIh2RLLt+GCEAJaSDoRmJ0hmQF8MGru+7BK5qLlR6N7WFmL4wegs3sV6dov/pyoBXatm0qx3p+g==}
     peerDependencies:
       '@tanstack/react-query': ^5.25.0
-      '@trpc/client': 11.0.0-rc.366+237dbb3f9
-      '@trpc/server': 11.0.0-rc.366+237dbb3f9
+      '@trpc/client': 11.0.0-rc.370+1a920ac81
+      '@trpc/server': 11.0.0-rc.370+1a920ac81
       react: '>=18.2.0'
       react-dom: '>=18.2.0'
 
-  '@trpc/server@11.0.0-rc.366':
-    resolution: {integrity: sha512-Pr7SdpIVrOGtIGt9vs7i3v0hqzlpXbi8/8RV7XfrXVJ5hlzKYOz5VE0AjckhHXuhrUlpTGTDm0/2nz0ywLcQ2g==}
+  '@trpc/server@11.0.0-rc.370':
+    resolution: {integrity: sha512-wmAujmM8C21UgSk408436OolK5iOKgLUkMvp1LjON++MRNmZYmFb6JmnjPHn0K9wX0V0qMlME2NGb7v8uTB3lw==}
 
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
@@ -475,6 +480,9 @@ packages:
   '@types/node@20.12.11':
     resolution: {integrity: sha512-vDg9PZ/zi+Nqp6boSOT7plNuthRugEKixDv5sFTIpkE89MmNtEArAShI4mxuX2+UrLEe9pxC1vm2cjm9YlWbJw==}
 
+  '@types/node@20.12.12':
+    resolution: {integrity: sha512-eWLDGF/FOSPtAvEqeRAQ4C8LSA7M1I7i0ky1I8U7kD1J5ITyW3AsRhQrKVoWf5pFKZ2kILsEGJhsI9r93PYnOw==}
+
   '@types/node@20.12.9':
     resolution: {integrity: sha512-o93r47yu04MHumPBCFg0bMPBMNgtMg3jzbhl7e68z50+BMHmRMGDJv13eBlUgOdc9i/uoJXGMGYLtJV4ReTXEg==}
 
@@ -484,8 +492,8 @@ packages:
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
-  '@types/react@18.3.1':
-    resolution: {integrity: sha512-V0kuGBX3+prX+DQ/7r2qsv1NsdfnCLnTgnRJ1pYnxykBhGMz+qj+box5lq7XsO5mtZsBqpjwwTu/7wszPfMBcw==}
+  '@types/react@18.3.2':
+    resolution: {integrity: sha512-Btgg89dAnqD4vV7R3hlwOxgqobUQKgx3MmrQRi0yYbs/P0ym8XozIAlkqVilPqHQwXs4e9Tf63rrCgl58BcO4w==}
 
   '@types/statuses@2.0.5':
     resolution: {integrity: sha512-jmIUGWrAiwu3dZpxntxieC+1n/5c3mjrImkmOSQ2NC5uP6cYO4aAZDdSmRcI5C1oiTmqlZGHC+/NmJrKogbP5A==}
@@ -780,9 +788,9 @@ packages:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
 
-  glob@10.3.12:
-    resolution: {integrity: sha512-TCNv8vJ+xz4QiqTpfOJA7HvYv+tNIRHKfUWw/q+v2jdgN4ebz+KY9tGx5J4rHP0o84mNP+ApH66HRX8us3Khqg==}
-    engines: {node: '>=16 || 14 >=14.17'}
+  glob@10.3.15:
+    resolution: {integrity: sha512-0c6RlJt1TICLyvJYIApxb8GsXoai0KUP7AxKKAtsYXdgJR1mGEUa7DgwShbdk1nly0PYoZj01xd4hzbq3fsjpw==}
+    engines: {node: '>=16 || 14 >=14.18'}
     hasBin: true
 
   graphql@16.8.1:
@@ -949,8 +957,8 @@ packages:
     resolution: {integrity: sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  minipass@7.0.4:
-    resolution: {integrity: sha512-jYofLM5Dam9279rdkWzqHozUo4ybjdZmCsDHePy5V/PbBcVMiSZR97gmAy45aqi8CK1lG2ECd356FU86avfwUQ==}
+  minipass@7.1.1:
+    resolution: {integrity: sha512-UZ7eQ+h8ywIRAW1hIEl2AqdwzJucU/Kp59+8kkZeSvafXhZjul247BvIJjEVFVeON6d7lM46XX1HXCduKAS8VA==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   mlly@1.7.0:
@@ -1011,9 +1019,9 @@ packages:
     resolution: {integrity: sha512-haREypq7xkM7ErfgIyA0z+Bj4AGKlMSdlQE2jvJo6huWD1EdkKYV+G/T4nq0YEF2vgTT8kqMFKo1uHn950r4SQ==}
     engines: {node: '>=12'}
 
-  path-scurry@1.10.2:
-    resolution: {integrity: sha512-7xTavNy5RQXnsjANvVvMkEjvloOinkAjv/Z6Ildz9v2RinZ4SBKTWFOVRbaF8p0vpHnyjV/UwNDdKuUv6M5qcA==}
-    engines: {node: '>=16 || 14 >=14.17'}
+  path-scurry@1.11.1:
+    resolution: {integrity: sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==}
+    engines: {node: '>=16 || 14 >=14.18'}
 
   path-to-regexp@6.2.2:
     resolution: {integrity: sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw==}
@@ -1102,9 +1110,9 @@ packages:
   rfdc@1.3.1:
     resolution: {integrity: sha512-r5a3l5HzYlIC68TpmYKlxWjmOP6wiPJ1vWv2HeLhNsRZMrCkxeqxiHlQ21oXmQ4F3SiryXBHhAD7JZqvOJjFmg==}
 
-  rimraf@5.0.5:
-    resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
-    engines: {node: '>=14'}
+  rimraf@5.0.7:
+    resolution: {integrity: sha512-nV6YcJo5wbLW77m+8KjH8aB/7/rxQy9SZ0HY5shnwULfS+9nmTtVXAJET5NdZmCzA4fPI/Hm1wo/Po/4mopOdg==}
+    engines: {node: '>=14.18'}
     hasBin: true
 
   rollup@4.17.2:
@@ -1268,8 +1276,8 @@ packages:
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
-  undici@6.16.0:
-    resolution: {integrity: sha512-HQfVddOTb5PJtfLnJ1Px8bNGyIg/z7WTj1hjUSna1Itsv59Oca9JdclIU08ToNqvWWXjFLRzc9rqjnpfw5UWcQ==}
+  undici@6.16.1:
+    resolution: {integrity: sha512-NeNiTT7ixpeiL1qOIU/xTVpHpVP0svmI6PwoCKaMGaI5AsHOaRdwqU/f7Fi9eyU4u03nd5U/BC8wmRMnS9nqoA==}
     engines: {node: '>=18.17'}
 
   universalify@0.2.0:
@@ -1634,11 +1642,11 @@ snapshots:
 
   '@sinclair/typebox@0.27.8': {}
 
-  '@tanstack/query-core@5.35.1': {}
+  '@tanstack/query-core@5.36.0': {}
 
-  '@tanstack/react-query@5.35.1(react@18.3.1)':
+  '@tanstack/react-query@5.36.0(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.35.1
+      '@tanstack/query-core': 5.36.0
       react: 18.3.1
 
   '@testing-library/dom@10.1.0':
@@ -1652,7 +1660,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.5(vitest@1.6.0(@types/node@20.12.11)(jsdom@24.0.0))':
+  '@testing-library/jest-dom@6.4.5(vitest@1.6.0(@types/node@20.12.12)(jsdom@24.0.0))':
     dependencies:
       '@adobe/css-tools': 4.3.3
       '@babel/runtime': 7.24.5
@@ -1663,9 +1671,9 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
     optionalDependencies:
-      vitest: 1.6.0(@types/node@20.12.11)(jsdom@24.0.0)
+      vitest: 1.6.0(@types/node@20.12.12)(jsdom@24.0.0)
 
-  '@testing-library/react@15.0.7(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@15.0.7(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.24.5
       '@testing-library/dom': 10.1.0
@@ -1673,21 +1681,21 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
-      '@types/react': 18.3.1
+      '@types/react': 18.3.2
 
-  '@trpc/client@11.0.0-rc.366(@trpc/server@11.0.0-rc.366)':
+  '@trpc/client@11.0.0-rc.370(@trpc/server@11.0.0-rc.370)':
     dependencies:
-      '@trpc/server': 11.0.0-rc.366
+      '@trpc/server': 11.0.0-rc.370
 
-  '@trpc/react-query@11.0.0-rc.366(@tanstack/react-query@5.35.1(react@18.3.1))(@trpc/client@11.0.0-rc.366(@trpc/server@11.0.0-rc.366))(@trpc/server@11.0.0-rc.366)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@trpc/react-query@11.0.0-rc.370(@tanstack/react-query@5.36.0(react@18.3.1))(@trpc/client@11.0.0-rc.370(@trpc/server@11.0.0-rc.370))(@trpc/server@11.0.0-rc.370)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/react-query': 5.35.1(react@18.3.1)
-      '@trpc/client': 11.0.0-rc.366(@trpc/server@11.0.0-rc.366)
-      '@trpc/server': 11.0.0-rc.366
+      '@tanstack/react-query': 5.36.0(react@18.3.1)
+      '@trpc/client': 11.0.0-rc.370(@trpc/server@11.0.0-rc.370)
+      '@trpc/server': 11.0.0-rc.370
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@trpc/server@11.0.0-rc.366': {}
+  '@trpc/server@11.0.0-rc.370': {}
 
   '@types/aria-query@5.0.4': {}
 
@@ -1703,6 +1711,11 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
+  '@types/node@20.12.12':
+    dependencies:
+      undici-types: 5.26.5
+    optional: true
+
   '@types/node@20.12.9':
     dependencies:
       undici-types: 5.26.5
@@ -1711,9 +1724,9 @@ snapshots:
 
   '@types/react-dom@18.3.0':
     dependencies:
-      '@types/react': 18.3.1
+      '@types/react': 18.3.2
 
-  '@types/react@18.3.1':
+  '@types/react@18.3.2':
     dependencies:
       '@types/prop-types': 15.7.12
       csstype: 3.1.3
@@ -2009,13 +2022,13 @@ snapshots:
 
   get-stream@8.0.1: {}
 
-  glob@10.3.12:
+  glob@10.3.15:
     dependencies:
       foreground-child: 3.1.1
       jackspeak: 2.3.6
       minimatch: 9.0.4
-      minipass: 7.0.4
-      path-scurry: 1.10.2
+      minipass: 7.1.1
+      path-scurry: 1.11.1
 
   graphql@16.8.1: {}
 
@@ -2189,7 +2202,7 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.1
 
-  minipass@7.0.4: {}
+  minipass@7.1.1: {}
 
   mlly@1.7.0:
     dependencies:
@@ -2254,10 +2267,10 @@ snapshots:
 
   path-key@4.0.0: {}
 
-  path-scurry@1.10.2:
+  path-scurry@1.11.1:
     dependencies:
       lru-cache: 10.2.2
-      minipass: 7.0.4
+      minipass: 7.1.1
 
   path-to-regexp@6.2.2: {}
 
@@ -2335,9 +2348,9 @@ snapshots:
 
   rfdc@1.3.1: {}
 
-  rimraf@5.0.5:
+  rimraf@5.0.7:
     dependencies:
-      glob: 10.3.12
+      glob: 10.3.15
 
   rollup@4.17.2:
     dependencies:
@@ -2492,7 +2505,7 @@ snapshots:
 
   undici-types@5.26.5: {}
 
-  undici@6.16.0: {}
+  undici@6.16.1: {}
 
   universalify@0.2.0: {}
 
@@ -2501,13 +2514,13 @@ snapshots:
       querystringify: 2.2.0
       requires-port: 1.0.0
 
-  vite-node@1.6.0(@types/node@20.12.11):
+  vite-node@1.6.0(@types/node@20.12.12):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.11(@types/node@20.12.11)
+      vite: 5.2.11(@types/node@20.12.12)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -2518,16 +2531,16 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11(@types/node@20.12.11):
+  vite@5.2.11(@types/node@20.12.12):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
-      '@types/node': 20.12.11
+      '@types/node': 20.12.12
       fsevents: 2.3.3
 
-  vitest@1.6.0(@types/node@20.12.11)(jsdom@24.0.0):
+  vitest@1.6.0(@types/node@20.12.12)(jsdom@24.0.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -2546,11 +2559,11 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11(@types/node@20.12.11)
-      vite-node: 1.6.0(@types/node@20.12.11)
+      vite: 5.2.11(@types/node@20.12.12)
+      vite-node: 1.6.0(@types/node@20.12.12)
       why-is-node-running: 2.2.2
     optionalDependencies:
-      '@types/node': 20.12.11
+      '@types/node': 20.12.12
       jsdom: 24.0.0
     transitivePeerDependencies:
       - less

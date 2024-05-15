@@ -8,16 +8,18 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@tanstack/react-query": "5.35.1",
+    "@tanstack/react-query": "5.36.0",
     "@testing-library/jest-dom": "6.4.5",
     "@testing-library/react": "15.0.7",
-    "@trpc/client": "11.0.0-rc.366",
-    "@trpc/react-query": "11.0.0-rc.366",
-    "@types/react": "18.3.1",
+    "@trpc/client": "11.0.0-rc.370",
+    "@trpc/react-query": "11.0.0-rc.370",
+    "@trpc/server": "11.0.0-rc.370",
+    "@types/react": "18.3.2",
     "@types/react-dom": "18.3.0",
     "jsdom": "24.0.0",
     "msw": "2.3.0-ws.rc-6",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "superjson": "2.2.1"
   }
 }

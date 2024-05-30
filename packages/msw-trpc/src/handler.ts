@@ -259,12 +259,16 @@ const createTrpcHandler = (
           { once: true }
         )
       }),
-      trigger: (input: unknown) => {
+      trigger: async (input: unknown, wait = 10) => {
+        // Ensure the subscription is started before triggering it
+        await  new Promise((resolve) => setTimeout(resolve, wait))
+
         if (!innerTrigger) {
           throw new Error('Subscription not started')
         }
 
         innerTrigger(input)
+        await  new Promise((resolve) => setTimeout(resolve, wait))
       },
     }
   }

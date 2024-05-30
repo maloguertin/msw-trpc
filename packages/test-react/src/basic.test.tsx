@@ -188,9 +188,7 @@ describe.only('basic', () => {
 
     expect(screen.getByText('Hello')).toBeInTheDocument()
 
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    subscription.trigger({ id: '5', name: 'Didier' })
+    await subscription.trigger({ id: '5', name: 'Didier' })
 
     await waitFor(() => {
       expect(screen.getByText('Didier')).toBeInTheDocument()
@@ -285,9 +283,7 @@ describe.only('basic', () => {
       expect(screen.getByText('Tutu')).toBeInTheDocument()
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    subscription.trigger({ id: '5', name: 'Didier' })
+    await subscription.trigger({ id: '5', name: 'Didier' })
 
     await waitFor(() => {
       expect(screen.getByText('Didier')).toBeInTheDocument()

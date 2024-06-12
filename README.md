@@ -139,6 +139,21 @@ Please note:
 
 - calling `req.getInput` and req.json in the same mutation handler will fail
 
+
+## Usage With `superjson`
+
+```typescript
+import { createTRPCMsw } from 'msw-trpc'
+import type { AppRouter } from 'path/to/your/router'
+import superjson from 'superjson';
+
+export const trpcMsw = createTRPCMsw<AppRouter>({
+  transformer: {
+    input: superjson, /* 👈 */
+    output: superjson, /* 👈 */
+  },
+})
+```
 ## Config
 
 `createTRPCMsw` accepts a 2nd argument:

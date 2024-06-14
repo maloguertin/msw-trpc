@@ -12,6 +12,6 @@
     "@trpc/server": "11.0.0-rc.370",
     "msw": "2.3.0-ws.rc-6",
     "superjson": "2.2.1",
-    "undici": "6.16.1"
+    "undici": "6.19.0"
   }
 }

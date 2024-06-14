@@ -7,7 +7,7 @@ import superjson from 'superjson'
 
 import { links } from './links.js'
 import { AppRouter } from './router.js'
-import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { createTRPCMsw } from '../../../msw-trpc/src/index.js'
 import { httpLink } from '../../../msw-trpc/src/links.js'
 
 const mswLinks = [

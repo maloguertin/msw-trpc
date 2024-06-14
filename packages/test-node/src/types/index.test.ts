@@ -5,7 +5,7 @@ import { describe, expectTypeOf, test } from 'vitest'
 import superjson from 'superjson'
 
 import { AppRouter, AppRouterWithSuperJson, NestedAppRouter, User } from './router.js'
-import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { createTRPCMsw } from '../../../msw-trpc/src/index.js'
 import { httpLink } from '../../../msw-trpc/src/links.js'
 
 type PromiseOrValue<T> = T | Promise<T>

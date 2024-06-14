@@ -7,7 +7,7 @@ import { describe, test, beforeAll, afterAll, expect, afterEach } from 'vitest'
 
 import { links } from './links.js'
 import { AppRouter, NestedAppRouter } from '../routers.js'
-import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { createTRPCMsw } from '../../../msw-trpc/src/index.js'
 import { httpLink } from '../../../msw-trpc/src/links.js'
 
 const mswLinks = [

@@ -4,7 +4,7 @@ import { HttpHandler, WebSocketHandler } from 'msw'
 import { describe, test, expect } from 'vitest'
 
 import { AppRouter, NestedAppRouter } from '../routers.js'
-import createTRPCMsw from '../../../msw-trpc/src/createTRPCMsw.js'
+import { createTRPCMsw } from '../../../msw-trpc/src/index.js'
 import { createWSClient, httpLink, splitLink, wsLink } from '../../../msw-trpc/src/links.js'
 
 describe('building handlers based on trpc links', () => {

@@ -1,7 +1,7 @@
 {
   "name": "msw-trpc",
   "version": "2.0.0-beta.1",
-  "description": "Trpc API for Mock Service Worker (MSW).",
+  "description": "tRPC API for Mock Service Worker (MSW).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

@@ -109,9 +109,9 @@ Returns the parsed input from the request
 ```typescript
 //router.ts
 const appRouter = t.router({
-  userById: t.procedure.input(z.object({ name: z.string() })).query(req => {
+  userById: t.procedure.input(z.object({ name: z.string() })).query((req) => {
     const { input } = req
-    const user = userList.find(u => u.name === input.name)
+    const user = userList.find((u) => u.name === input.name)
     return user
   }),
 })

@@ -1,0 +1,40 @@
+{
+  "name": "msw-trpc",
+  "version": "2.0.0-beta.1",
+  "description": "tRPC API for Mock Service Worker (MSW).",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "author": "Malo Guertin",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsc --build",
+    "type-check": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maloguertin/msw-trpc.git"
+  },
+  "keywords": [
+    "msw",
+    "trpc",
+    "testing",
+    "api"
+  ],
+  "bugs": {
+    "url": "https://github.com/maloguertin/msw-trpc/issues"
+  },
+  "homepage": "https://github.com/maloguertin/msw-trpc#readme",
+  "dependencies": {
+    "@trpc/client": "11.0.0-rc.403",
+    "msw": "2.3.0-ws.rc-6"
+  },
+  "peerDependencies": {
+    "@trpc/server": ">=11.0.0-rc.403",
+    "msw": ">=2.3.0-ws.rc-6"
+  }
+}

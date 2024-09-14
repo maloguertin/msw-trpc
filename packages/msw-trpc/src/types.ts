@@ -6,8 +6,7 @@ import type {
   inferTransformedProcedureOutput,
   TRPCCombinedDataTransformer,
 } from '@trpc/server'
-import { Observable } from '@trpc/server/observable'
-import type { RequestHandler, WebSocketHandler } from 'msw'
+import type { RequestHandler } from 'msw'
 import { Link } from './links.js'
 
 type PromiseOrValue<T> = T | Promise<T>
@@ -31,24 +30,15 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
     ? $Value extends RouterRecord
       ? ProcedureHandlerRecord<TRouter, $Value>
       : $Value extends AnyTRPCProcedure
-        ? $Value['_def']['type'] extends 'subscription'
+        ? $Value['_def']['type'] extends 'query' | 'mutation'
           ? {
-              subscription: (
-                handler?: (
-                  input: inferProcedureInput<$Value>
-                ) => Observable<inferTransformedProcedureOutputOrVoid<TRouter, $Value>, unknown>
-              ) => {
-                handler: WebSocketHandler
-                trigger: (data: inferTransformedProcedureOutputOrVoid<TRouter, $Value>) => void
-              }
-            }
-          : {
-              [K in `${$Value['_def']['type']}`]: (
+              [K in $Value['_def']['type']]: (
                 handler: (
                   input: inferProcedureInput<$Value>
                 ) => PromiseOrValue<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>
               ) => RequestHandler
             }
+          : never
         : never
     : never
 }

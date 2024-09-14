@@ -7,17 +7,16 @@
     "test": "vitest --run",
     "type-check": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@tanstack/react-query": "5.45.0",
-    "@testing-library/jest-dom": "6.4.6",
-    "@testing-library/react": "16.0.0",
-    "@trpc/client": "11.0.0-rc.403",
-    "@trpc/react-query": "11.0.0-rc.403",
-    "@trpc/server": "11.0.0-rc.403",
-    "@types/react": "18.3.3",
-    "@types/react-dom": "18.3.0",
-    "jsdom": "24.1.0",
-    "msw": "2.3.0-ws.rc-6",
+  "dependencies": {
+    "@tanstack/react-query": "5.56.2",
+    "@testing-library/jest-dom": "6.5.0",
+    "@testing-library/react": "16.0.1",
+    "@trpc/client": "11.0.0-rc.502",
+    "@trpc/react-query": "11.0.0-rc.502",
+    "@trpc/server": "11.0.0-rc.502",
+    "happy-dom": "^15.7.4",
+    "jsdom": "25.0.0",
+    "msw": "2.4.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "superjson": "2.2.1"

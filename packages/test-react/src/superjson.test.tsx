@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll, afterEach } from 'vitest'
+import { describe, test, expect, beforeAll, afterAll } from 'vitest'
 import { createTRPCMsw, httpLink } from '../../msw-trpc/src'
 import { setupServer } from 'msw/node'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -12,7 +12,6 @@ describe('superjson', () => {
   const server = setupServer()
 
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
   test('http link', async () => {

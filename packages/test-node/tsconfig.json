@@ -2,7 +2,6 @@
   "include": ["src"],
   "compilerOptions": {
     "outDir": "dist",
-    // Added DOM to have global websocket typed
     "lib": ["esnext", "DOM"],
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
@@ -11,7 +10,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "esnext",
-    "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,

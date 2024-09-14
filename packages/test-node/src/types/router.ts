@@ -1,6 +1,5 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
-import { observable } from '@trpc/server/observable'
 
 const t = initTRPC.create()
 
@@ -112,17 +111,6 @@ const appRouter = t.router({
       return input
     }),
   noReturn: t.procedure.mutation(() => {}),
-  getUserUpdates: t.procedure
-    .input((val: unknown) => {
-      if (typeof val === 'string') return val
-
-      throw new Error(`Invalid input: ${typeof val}`)
-    })
-    .subscription(() => {
-      return observable<User>((emit) => {
-        emit.next({ id: '1', name: 'KATT' })
-      })
-    }),
 })
 
 const appRouterWithSuperJson = tWithSuperJson.router({

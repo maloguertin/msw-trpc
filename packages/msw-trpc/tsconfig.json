@@ -2,7 +2,7 @@
   "include": ["src"],
   "compilerOptions": {
     "outDir": "dist",
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "sourceMap": true,
@@ -10,7 +10,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "esnext",
-    "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,

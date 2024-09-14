@@ -1,5 +1,4 @@
 import { initTRPC } from '@trpc/server'
-import { observable } from '@trpc/server/observable'
 
 const t = initTRPC.create()
 
@@ -42,17 +41,6 @@ const appRouter = t.router({
         id: '2',
         name: input,
       } as User
-    }),
-  getUserUpdates: t.procedure
-    .input((val: unknown) => {
-      if (typeof val === 'string') return val
-
-      throw new Error(`Invalid input: ${typeof val}`)
-    })
-    .subscription(() => {
-      return observable<User>((emit) => {
-        emit.next({ id: '3', name: 'Marie' })
-      })
     }),
 })
 

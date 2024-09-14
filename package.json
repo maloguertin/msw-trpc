@@ -1,7 +1,7 @@
 {
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@9.3.0",
+  "packageManager": "pnpm@9.10.0",
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
@@ -12,22 +12,11 @@
     "test": "pnpm --filter \"./packages/**\" test"
   },
   "devDependencies": {
-    "@types/react": "18.3.3",
+    "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
-    "@types/ws": "8.5.10",
-    "lint-staged": "15.2.7",
-    "prettier": "3.3.2",
-    "rimraf": "5.0.7",
-    "simple-git-hooks": "2.11.1",
-    "typescript": "5.4.5",
-    "vitest": "1.6.0"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*.ts?(x)": [
-      "prettier --parser=typescript --write"
-    ]
+    "prettier": "3.3.3",
+    "rimraf": "6.0.1",
+    "typescript": "5.6.2",
+    "vitest": "2.1.1"
   }
 }

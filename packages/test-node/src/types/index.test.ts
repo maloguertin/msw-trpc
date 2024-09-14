@@ -1,6 +1,4 @@
-import { Observable } from '@trpc/server/observable'
-
-import { RequestHandler, WebSocketHandler } from 'msw'
+import { RequestHandler } from 'msw'
 import { describe, expectTypeOf, test } from 'vitest'
 import superjson from 'superjson'
 
@@ -26,24 +24,15 @@ const mswTrpcWithSuperJson = createTRPCMsw<AppRouterWithSuperJson>({
 })
 
 describe('proxy returned by createMswTrpc', () => {
-  test('should expose property query on properties that match TRPC query procedures', () => {
+  test('should expose property query on properties that match tRPC query procedures', () => {
     expectTypeOf(mswTrpc.userById.query).toEqualTypeOf<
       (handler: (input: string) => PromiseOrValue<User | undefined>) => RequestHandler
     >()
   })
 
-  test('should expose property mutation on properties that match TRPC mutation procedures', () => {
+  test('should expose property mutation on properties that match tRPC mutation procedures', () => {
     expectTypeOf(mswTrpc.createUser.mutation).toEqualTypeOf<
       (handler: (input: string) => PromiseOrValue<User>) => RequestHandler
-    >()
-  })
-
-  test('should expose property subscription on properties that match TRPC subscription procedures', () => {
-    expectTypeOf(mswTrpc.getUserUpdates.subscription).toEqualTypeOf<
-      (handler?: (input: string) => Observable<User, unknown>) => {
-        handler: WebSocketHandler
-        trigger: (data: User) => void
-      }
     >()
   })
 
@@ -57,7 +46,7 @@ describe('proxy returned by createMswTrpc', () => {
   })
 
   describe('with merged routers', () => {
-    test('should expose property query on properties that match TRPC query procedures', () => {
+    test('should expose property query on properties that match tRPC query procedures', () => {
       expectTypeOf(nestedMswTrpc.deeply.nested.userById.query).toEqualTypeOf<
         (handler: (input: string) => PromiseOrValue<User | undefined>) => RequestHandler
       >()

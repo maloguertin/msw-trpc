@@ -17,4 +17,8 @@ jobs:
 
       - uses: pnpm/action-setup@v3
 
+      - run: pnpm prettier --check .
+
+      - run: pnpm type-check
+
       - run: pnpm test

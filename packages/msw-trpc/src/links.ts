@@ -17,7 +17,6 @@ export const splitLink = (opts: {
   true: Link
   false: Link
 }) => {
-
   return ((op: Pick<Operation, 'type' | 'path'>) => {
     const link = opts.condition(op) ? opts.true : opts.false
     return link()

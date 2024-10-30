@@ -90,5 +90,5 @@ const createTrpcHandler = (
 export const trpc = {
   query: (path: string, handler: Function, opts: TRPCMswConfig) => createTrpcHandler('query', path, handler, opts),
   mutation: (path: string, handler: Function, opts: TRPCMswConfig) =>
-    createTrpcHandler('mutation', path, handler, opts)
+    createTrpcHandler('mutation', path, handler, opts),
 }

@@ -23,6 +23,8 @@ jobs:
 
       - uses: pnpm/action-setup@v3
 
+      - run: pnpm install
+
       - run: pnpm prettier --check .
 
       - run: pnpm type-check
@@ -30,7 +32,7 @@ jobs:
       - run: pnpm test
 
       - run: |
-          cd packages/my-package
+          cd packages/msw-trpc
           pnpm build
           pnpm publish
         env:

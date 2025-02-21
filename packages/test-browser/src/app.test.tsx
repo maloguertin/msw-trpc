@@ -1,11 +1,11 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+import { describe, expect } from 'vitest'
 import { page } from '@vitest/browser/context'
-import { setupWorker } from 'msw/browser'
 import { render } from 'vitest-browser-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createTRPCMsw, httpLink } from '../../msw-trpc/src/index.ts'
 import type { PropsWithChildren } from 'react'
 import superjson from 'superjson'
+import { test } from './test.ts'
 
 import type { AppRouter } from './router.ts'
 import { App } from './app.tsx'
@@ -31,11 +31,6 @@ const MockedProviders = (props: PropsWithChildren) => {
 }
 
 describe('basics', () => {
-  const worker = setupWorker()
-
-  beforeAll(() => worker.start({ onUnhandledRequest: 'error' }))
-  afterAll(() => worker.stop())
-
   test('should render', async () => {
     render(<App />, { wrapper: MockedProviders })
 
@@ -44,13 +39,13 @@ describe('basics', () => {
     await expect.element(div).toBeInTheDocument()
   })
 
-  test('with msw', async () => {
+  test('with msw', async ({ worker }) => {
     worker.use(
       mswTrpc.userById.query(({ input }) => {
         return { id: input, name: 'Tutu' }
       })
     )
-    
+
     render(<App />, { wrapper: MockedProviders })
 
     const div = page.getByText('Tutu')

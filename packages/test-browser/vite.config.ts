@@ -8,11 +8,11 @@ export default defineConfig({
       provider: 'playwright',
       enabled: true,
       instances: [
-        { 
+        {
           mockReset: true,
           clearMocks: true,
-          browser: 'chromium'
-         }
+          browser: 'chromium',
+        },
       ],
     },
   },

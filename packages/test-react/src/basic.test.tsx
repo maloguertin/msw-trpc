@@ -4,8 +4,9 @@ import { setupServer } from 'msw/node'
 import { render, screen, waitFor } from '@testing-library/react'
 import type { AppRouter } from './routers/basic.js'
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createTRPCReact, httpLink as TRPChttpLink } from '@trpc/react-query'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { createTRPCClient, httpLink as TRPCClientHttpLink } from '@trpc/client'
+import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query'
 
 describe('basic', () => {
   const server = setupServer()
@@ -16,18 +17,21 @@ describe('basic', () => {
   test('http link', async () => {
     const queryClient = new QueryClient()
 
-    const trpc = createTRPCReact<AppRouter>()
+    const links = [
+      TRPCClientHttpLink({
+        url: 'http://localhost:3000/trpc',
+      }),
+    ]
 
-    const client = trpc.createClient({
-      links: [
-        TRPChttpLink({
-          url: 'http://localhost:3000/trpc',
-        }),
-      ],
+    const trpcClient = createTRPCClient<AppRouter>({ links })
+
+    const trpc = createTRPCOptionsProxy<AppRouter>({
+      client: trpcClient,
+      queryClient,
     })
 
     const App = () => {
-      const { data } = trpc.userById.useQuery('1')
+      const { data } = useQuery(trpc.userById.queryOptions('1'))
 
       if (data) {
         return <div>{data.name}</div>
@@ -56,11 +60,9 @@ describe('basic', () => {
     )
 
     render(
-      <trpc.Provider client={client} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </trpc.Provider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     )
 
     expect(screen.getByText('Hello')).toBeInTheDocument()

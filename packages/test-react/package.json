@@ -9,15 +9,18 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.66.8",
-    "@testing-library/jest-dom": "6.6.3",
-    "@testing-library/react": "16.2.0",
     "@trpc/client": "11.0.0-rc.795",
     "@trpc/react-query": "11.0.0-rc.795",
     "@trpc/server": "11.0.0-rc.795",
-    "happy-dom": "17.1.1",
-    "msw": "2.7.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "superjson": "2.2.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.2.0",
+    "happy-dom": "17.1.1",
+    "msw": "2.7.1",
+    "vitest": "3.0.6"
   }
 }

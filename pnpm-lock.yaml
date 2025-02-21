@@ -23,9 +23,6 @@ importers:
       typescript:
         specifier: 5.7.3
         version: 5.7.3
-      vitest:
-        specifier: 3.0.6
-        version: 3.0.6(@types/node@22.13.4)(happy-dom@17.1.1)(jsdom@26.0.0)(msw@2.7.1(@types/node@22.13.4)(typescript@5.7.3))
 
   packages/msw-trpc:
     dependencies:
@@ -47,27 +44,25 @@ importers:
       '@trpc/server':
         specifier: 11.0.0-rc.795
         version: 11.0.0-rc.795(typescript@5.7.3)
-      msw:
-        specifier: 2.7.1
-        version: 2.7.1(@types/node@22.13.4)(typescript@5.7.3)
       superjson:
         specifier: 2.2.2
         version: 2.2.2
       undici:
         specifier: 7.3.0
         version: 7.3.0
+    devDependencies:
+      msw:
+        specifier: 2.7.1
+        version: 2.7.1(@types/node@22.13.4)(typescript@5.7.3)
+      vitest:
+        specifier: 3.0.6
+        version: 3.0.6(@types/node@22.13.4)(happy-dom@17.1.1)(jsdom@26.0.0)(msw@2.7.1(@types/node@22.13.4)(typescript@5.7.3))
 
   packages/test-react:
     dependencies:
       '@tanstack/react-query':
         specifier: 5.66.8
         version: 5.66.8(react@19.0.0)
-      '@testing-library/jest-dom':
-        specifier: 6.6.3
-        version: 6.6.3
-      '@testing-library/react':
-        specifier: 16.2.0
-        version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@trpc/client':
         specifier: 11.0.0-rc.795
         version: 11.0.0-rc.795(@trpc/server@11.0.0-rc.795(typescript@5.7.3))(typescript@5.7.3)
@@ -77,12 +72,6 @@ importers:
       '@trpc/server':
         specifier: 11.0.0-rc.795
         version: 11.0.0-rc.795(typescript@5.7.3)
-      happy-dom:
-        specifier: 17.1.1
-        version: 17.1.1
-      msw:
-        specifier: 2.7.1
-        version: 2.7.1(@types/node@22.13.4)(typescript@5.7.3)
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -92,6 +81,22 @@ importers:
       superjson:
         specifier: 2.2.2
         version: 2.2.2
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: 6.6.3
+        version: 6.6.3
+      '@testing-library/react':
+        specifier: 16.2.0
+        version: 16.2.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      happy-dom:
+        specifier: 17.1.1
+        version: 17.1.1
+      msw:
+        specifier: 2.7.1
+        version: 2.7.1(@types/node@22.13.4)(typescript@5.7.3)
+      vitest:
+        specifier: 3.0.6
+        version: 3.0.6(@types/node@22.13.4)(happy-dom@17.1.1)(jsdom@26.0.0)(msw@2.7.1(@types/node@22.13.4)(typescript@5.7.3))
 
 packages:
 

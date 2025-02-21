@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "pretest": "npx msw init",
     "test": "vitest --run",
+    "posttest": "rimraf ./public/mockServiceWorker.js",
     "type-check": "tsc --noEmit",
     "dev": "vite",
     "build": "vite build"

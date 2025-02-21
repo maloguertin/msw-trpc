@@ -8,10 +8,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@trpc/client": "11.0.0-rc.502",
-    "@trpc/server": "11.0.0-rc.502",
-    "msw": "2.4.6",
-    "superjson": "2.2.1",
-    "undici": "6.19.8"
+    "@trpc/client": "11.0.0-rc.795",
+    "@trpc/server": "11.0.0-rc.795",
+    "msw": "2.7.1",
+    "superjson": "2.2.2",
+    "undici": "7.3.0"
   }
 }

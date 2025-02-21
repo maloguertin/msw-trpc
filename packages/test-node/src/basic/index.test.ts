@@ -40,7 +40,7 @@ describe('with http link', () => {
     })
 
     test('handle mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation((name) => ({ id: '2', name })))
+      server.use(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input })))
 
       const user = await trpc.createUser.mutate('Robert')
 
@@ -158,7 +158,7 @@ describe('with http link', () => {
     })
 
     test('mutations properly', async () => {
-      server.use(mswTrpc.deeply.nested.createUser.mutation((name) => ({ id: '2', name })))
+      server.use(mswTrpc.deeply.nested.createUser.mutation(({ input }) => ({ id: '2', name: input })))
       const user = await trpc.deeply.nested.createUser.mutate('Robert')
 
       expect(user).toEqual({ id: '2', name: 'Robert' })

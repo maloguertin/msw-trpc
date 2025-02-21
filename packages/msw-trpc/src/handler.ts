@@ -61,7 +61,7 @@ const createTrpcHandler = (
       return httpHandler(urlRegex, async (params) => {
         try {
           const input = await getInput(params.request, transformer)
-          const body = await handler!(input) // TS doesn't seem to understand that handler is defined here, despite the check above
+          const body = await handler!({ input }) // TS doesn't seem to understand that handler is defined here, despite the check above
           return HttpResponse.json({ result: { data: transformer.output.serialize(body) } })
         } catch (e) {
           if (!(e instanceof Error)) {

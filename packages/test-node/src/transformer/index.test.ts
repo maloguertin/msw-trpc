@@ -42,7 +42,7 @@ describe('with http link and superjson transformer', () => {
     })
 
     test('handle mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation((name) => ({ id: '2', name })))
+      server.use(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input })))
 
       const user = await trpc.createUser.mutate('Robert')
 
@@ -81,8 +81,8 @@ describe('with http link and superjson transformer', () => {
 
     test('superjson transformer works', async () => {
       server.use(
-        mswTrpc.superjson.query((date) => {
-          return new Set([date])
+        mswTrpc.superjson.query(({ input }) => {
+          return new Set([input])
         })
       )
 

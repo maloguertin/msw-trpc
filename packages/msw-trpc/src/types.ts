@@ -33,9 +33,11 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
         ? $Value['_def']['type'] extends 'query' | 'mutation'
           ? {
               [K in $Value['_def']['type']]: (
-                handler: (
+                handler: ({
+                  input,
+                }: {
                   input: inferProcedureInput<$Value>
-                ) => PromiseOrValue<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>
+                }) => PromiseOrValue<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>
               ) => RequestHandler
             }
           : never

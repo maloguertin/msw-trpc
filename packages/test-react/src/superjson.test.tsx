@@ -53,8 +53,8 @@ describe('superjson', () => {
     })
 
     server.use(
-      mswTrpc.userById.query((id) => {
-        return { id, name: 'Tutu' }
+      mswTrpc.userById.query(({ input }) => {
+        return { id: input, name: 'Tutu' }
       })
     )
 

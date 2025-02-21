@@ -22,14 +22,16 @@ describe('building handlers based on trpc links', () => {
       const mswTrpc = createTRPCMsw<AppRouter>({ links: mswLinks })
 
       expect(mswTrpc.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(HttpHandler)
-      expect(mswTrpc.createUser.mutation((name) => ({ id: '2', name }))).toBeInstanceOf(HttpHandler)
+      expect(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(HttpHandler)
     })
 
     test('should use http handler with nested routers', async () => {
       const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ links: mswLinks })
 
       expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(HttpHandler)
-      expect(nestedMswTrpc.deeply.nested.createUser.mutation((name) => ({ id: '2', name }))).toBeInstanceOf(HttpHandler)
+      expect(nestedMswTrpc.deeply.nested.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(
+        HttpHandler
+      )
     })
   })
 })

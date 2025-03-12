@@ -45,7 +45,7 @@ const createTrpcHandler = (
     throw new Error('Only a single link is supported')
   }
 
-  const { type: handlerType, url } = link({ type: procedureType, path })
+  const { type: handlerType, url, methodOverride } = link({ type: procedureType, path })
 
   if (!handler && (procedureType === 'query' || procedureType === 'mutation')) {
     throw new Error('Handler is required for query and mutation procedures')
@@ -54,7 +54,7 @@ const createTrpcHandler = (
   if (handlerType === 'http') {
     if (procedureType === 'query' || procedureType === 'mutation') {
       const getInput = procedureType === 'query' ? getQueryInput : getMutationInput
-      const httpHandler = procedureType === 'query' ? http.get : http.post
+      const httpHandler = procedureType === 'mutation' || methodOverride === 'POST' ? http.post : http.get
 
       const urlRegex = new RegExp(`${url}/${path.replace('.', '[/.|.]')}$`)
 

@@ -47,6 +47,38 @@ describe('with http link', () => {
       expect(user).toEqual({ id: '2', name: 'Robert' })
     })
 
+    test('should intercept GET method for queries', async () => {
+      server.use(mswTrpc.userById.query(() => ({ id: '1', name: 'Malo' })))
+
+      const interceptedPromise = new Promise<Request>((resolve) => {
+        server.events.on('request:start', ({ request }) => {
+          resolve(request)
+        })
+      })
+
+      await trpc.userById.query('1')
+
+      const intercepted = await interceptedPromise
+
+      expect(intercepted.method).toBe('GET')
+    })
+
+    test('should intercept POST method for mutations', async () => {
+      server.use(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input })))
+
+      const interceptedPromise = new Promise<Request>((resolve) => {
+        server.events.on('request:start', ({ request }) => {
+          resolve(request)
+        })
+      })
+
+      await trpc.createUser.mutate('Robert')
+
+      const intercepted = await interceptedPromise
+
+      expect(intercepted.method).toBe('POST')
+    })
+
     test('throwing error works', async () => {
       server.use(
         mswTrpc.userById.query(() => {

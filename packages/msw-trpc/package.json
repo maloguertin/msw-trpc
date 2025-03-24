@@ -30,11 +30,11 @@
   },
   "homepage": "https://github.com/maloguertin/msw-trpc#readme",
   "dependencies": {
-    "@trpc/client": "^11.0.0-rc.795",
-    "msw": "^2.0.0"
+    "@trpc/client": "^11.0.0",
+    "msw": "^2.7.3"
   },
   "peerDependencies": {
-    "@trpc/server": "^11.0.0-rc.795",
+    "@trpc/server": "^11.0.0",
     "msw": "^2.0.0"
   }
 }

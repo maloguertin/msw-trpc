@@ -11,21 +11,21 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.66.8",
-    "@trpc/client": "11.0.0-rc.795",
-    "@trpc/server": "11.0.0-rc.795",
-    "@trpc/tanstack-react-query": "11.0.0-rc.795",
+    "@tanstack/react-query": "5.69.0",
+    "@trpc/client": "11.0.0",
+    "@trpc/server": "11.0.0",
+    "@trpc/tanstack-react-query": "11.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "superjson": "2.2.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "4.3.4",
-    "@vitest/browser": "3.0.6",
-    "msw": "2.7.1",
-    "playwright": "1.50.1",
-    "vite": "6.1.1",
-    "vitest": "3.0.6",
+    "@vitest/browser": "3.0.9",
+    "msw": "2.7.3",
+    "playwright": "1.51.1",
+    "vite": "6.2.3",
+    "vitest": "3.0.9",
     "vitest-browser-react": "0.1.1"
   },
   "msw": {

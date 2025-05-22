@@ -1,0 +1,36 @@
+{
+  "name": "test-browser",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pretest": "npx msw init",
+    "test": "vitest --run",
+    "posttest": "rimraf ./public/mockServiceWorker.js",
+    "type-check": "tsc --noEmit",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.74.4",
+    "@trpc/client": "11.1.0",
+    "@trpc/server": "11.1.0",
+    "@trpc/tanstack-react-query": "11.1.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "superjson": "2.2.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.4.1",
+    "@vitest/browser": "3.1.1",
+    "msw": "2.7.5",
+    "playwright": "1.52.0",
+    "vite": "6.3.2",
+    "vitest": "3.1.1",
+    "vitest-browser-react": "0.1.1"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}

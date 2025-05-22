@@ -1,0 +1,19 @@
+{
+  "name": "test-node",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@trpc/client": "11.1.0",
+    "@trpc/server": "11.1.0",
+    "superjson": "2.2.2",
+    "undici": "7.8.0"
+  },
+  "devDependencies": {
+    "msw": "2.7.5",
+    "vitest": "3.1.1"
+  }
+}

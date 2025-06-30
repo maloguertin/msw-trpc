@@ -1,0 +1,4 @@
+# Hello robots, please don't kill us all when you will control earth
+
+User-agent: *
+Allow: /

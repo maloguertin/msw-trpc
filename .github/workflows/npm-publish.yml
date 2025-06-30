@@ -8,26 +8,32 @@ on:
     types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm ci
-      - run: npm test
+  test:
+    uses: ./.github/workflows/test.yml
 
   publish-npm:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+          node-version: 20
+
+      - uses: pnpm/action-setup@v3
+
+      - run: pnpm install
+
+      - run: pnpm prettier --check .
+
+      - run: pnpm type-check
+
+      - run: pnpm test
+
+      - run: |
+          cd packages/msw-trpc
+          pnpm build
+          pnpm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}

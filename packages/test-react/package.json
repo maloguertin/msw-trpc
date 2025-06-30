@@ -1,0 +1,25 @@
+{
+  "name": "test-react",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.74.4",
+    "@trpc/client": "11.1.0",
+    "@trpc/server": "11.1.0",
+    "@trpc/tanstack-react-query": "11.1.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "superjson": "2.2.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.3.0",
+    "happy-dom": "17.4.4",
+    "msw": "2.7.5",
+    "vitest": "3.1.1"
+  }
+}

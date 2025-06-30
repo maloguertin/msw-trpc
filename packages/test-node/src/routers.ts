@@ -42,6 +42,9 @@ const appRouter = t.router({
         name: input,
       } as User
     }),
+  deleteAllUsers: t.procedure.mutation(() => {
+    return true
+  }),
 })
 
 const nestedRouter = t.router({ deeply: { nested: appRouter } })

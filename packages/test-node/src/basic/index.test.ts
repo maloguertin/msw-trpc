@@ -47,6 +47,14 @@ describe('with http link', () => {
       expect(user).toEqual({ id: '2', name: 'Robert' })
     })
 
+    test('handle mutations without input properly', async () => {
+      server.use(mswTrpc.deleteAllUsers.mutation(() => true))
+
+      const result = await trpc.deleteAllUsers.mutate()
+
+      expect(result).toEqual(true)
+    })
+
     test('should intercept GET method for queries', async () => {
       server.use(mswTrpc.userById.query(() => ({ id: '1', name: 'Malo' })))
 

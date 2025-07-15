@@ -32,6 +32,7 @@ jobs:
       - run: pnpm test
 
       - run: |
+          cp README.md packages/msw-trpc/README.md
           cd packages/msw-trpc
           pnpm build
           pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}

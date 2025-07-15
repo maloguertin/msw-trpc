@@ -1,6 +1,6 @@
 {
   "name": "msw-trpc",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "tRPC API for Mock Service Worker (MSW).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

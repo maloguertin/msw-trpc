@@ -39,6 +39,14 @@ describe('with http link', () => {
       expect(user).toEqual({ id: '1', name: 'Malo' })
     })
 
+    test('handle queries with input properly', async () => {
+      server.use(mswTrpc.userById.query(({ input }) => ({ id: input, name: 'Malo' })))
+
+      const user = await trpc.userById.query('3')
+
+      expect(user).toEqual({ id: '3', name: 'Malo' })
+    })
+
     test('handle mutations properly', async () => {
       server.use(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input })))
 

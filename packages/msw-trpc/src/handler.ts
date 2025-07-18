@@ -10,7 +10,12 @@ import {
 
 import { TRPCMswConfig } from './types.js'
 
-const getQueryInput = (req: Request, transformer: TRPCCombinedDataTransformer) => {
+const getQueryInput = async (req: Request, transformer: TRPCCombinedDataTransformer) => {
+  if (req.method === 'POST') {
+    const body = await req.json()
+
+    return transformer.input.deserialize(body)
+  }
   const inputString = new URL(req.url).searchParams.get('input')
 
   if (inputString == null) return inputString

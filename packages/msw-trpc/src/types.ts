@@ -6,8 +6,9 @@ import type {
   inferTransformedProcedureOutput,
   TRPCCombinedDataTransformer,
 } from '@trpc/server'
-import type { RequestHandler } from 'msw'
+import type { RequestHandler, WebSocketHandler } from 'msw'
 import { Link } from './links.js'
+import { inferAsyncIterableYield } from '@trpc/server/unstable-core-do-not-import'
 
 type PromiseOrValue<T> = T | Promise<T>
 
@@ -40,7 +41,19 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
                 }) => PromiseOrValue<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>
               ) => RequestHandler
             }
-          : never
+          : $Value['_def']['type'] extends 'subscription'
+            ? {
+              subscription: (
+                handler?: ({
+                  input,
+                  signal,
+                }: {
+                  input: inferProcedureInput<$Value>,
+                  signal: AbortSignal | undefined,
+                }) => AsyncIterable<inferAsyncIterableYield<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>, void, unknown>
+              ) => WebSocketHandler
+            }
+            : never
         : never
     : never
 }

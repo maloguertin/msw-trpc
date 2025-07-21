@@ -19,6 +19,12 @@ export const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfi
 
               return result
             }
+          } else if (lastKey === 'subscription') {
+            return (handler?: Function) => {
+              const result = trpc[lastKey](procedurePath, handler, { links, transformer })
+
+              return result
+            }
           }
 
           return createUntypedTRPCMsw([...pathParts, lastKey as string])
@@ -29,3 +35,4 @@ export const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfi
 
   return createUntypedTRPCMsw() as MswTrpc<Router>
 }
+

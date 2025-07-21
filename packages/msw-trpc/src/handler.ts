@@ -144,7 +144,7 @@ const createTrpcHandler = (
 
               // WebSocket.OPEN = 1
               if (client.socket.readyState !== 1) {
-                return;
+                return
               }
 
               if (clientSubscriptions.has(message.id)) {
@@ -153,39 +153,31 @@ const createTrpcHandler = (
                 throw new TRPCError({
                   message: `Duplicate id ${message.id}`,
                   code: 'BAD_REQUEST',
-                });
+                })
               }
 
-              const abortController = new AbortController();
+              const abortController = new AbortController()
 
               run(async () => {
                 const abortPromise = new Promise<'abort'>((resolve) => {
-                  abortController.signal.onabort = () => resolve('abort');
-                });
+                  abortController.signal.onabort = () => resolve('abort')
+                })
 
                 const opts = {
                   input,
                   signal: abortController.signal,
                 }
 
-                await using iterator = iteratorResource(handler!(opts) as AsyncIterable<unknown, void, unknown>);
+                await using iterator = iteratorResource(handler!(opts) as AsyncIterable<unknown, void, unknown>)
 
-                let next:
-                  | null
-                  | TRPCError
-                  | Awaited<
-                      typeof abortPromise | ReturnType<(typeof iterator)['next']>
-                    >;
+                let next: null | TRPCError | Awaited<typeof abortPromise | ReturnType<(typeof iterator)['next']>>
 
                 while (true) {
-                  next = await Unpromise.race([
-                    iterator.next().catch(getTRPCErrorFromUnknown),
-                    abortPromise,
-                  ]);
+                  next = await Unpromise.race([iterator.next().catch(getTRPCErrorFromUnknown), abortPromise])
 
                   if (next === 'abort') {
-                    await iterator.return?.();
-                    break;
+                    await iterator.return?.()
+                    break
                   }
                   if (next instanceof Error) {
                     client.send(
@@ -195,14 +187,14 @@ const createTrpcHandler = (
                         error: getSerializedTrpcError(next, path, transformer),
                       })
                     )
-                    continue;
+                    continue
                   }
                   if (next.done) {
-                    break;
+                    break
                   }
 
                   if (isTrackedEnvelope(next.value)) {
-                    const [id, data] = next.value;
+                    const [id, data] = next.value
                     client.send(
                       JSON.stringify({
                         id,
@@ -241,7 +233,7 @@ const createTrpcHandler = (
                 )
                 clientSubscriptions.delete(message.id)
               }).catch((cause) => {
-                const error = getTRPCErrorFromUnknown(cause);
+                const error = getTRPCErrorFromUnknown(cause)
                 client.send(
                   JSON.stringify({
                     id: message.id,
@@ -249,9 +241,9 @@ const createTrpcHandler = (
                     error: getSerializedTrpcError(error, path),
                   })
                 )
-                abortController.abort();
-              });
-              clientSubscriptions.set(message.id, abortController);
+                abortController.abort()
+              })
+              clientSubscriptions.set(message.id, abortController)
 
               client.send(
                 JSON.stringify({
@@ -291,12 +283,12 @@ const createTrpcHandler = (
       client.addEventListener(
         'close',
         () => {
-          clientSubscriptions.forEach((abortController) => abortController.abort());
-          clients.delete(client.id);
+          clientSubscriptions.forEach((abortController) => abortController.abort())
+          clients.delete(client.id)
         },
         { once: true }
       )
-    });
+    })
   }
 
   throw new Error('Unknown handler type')

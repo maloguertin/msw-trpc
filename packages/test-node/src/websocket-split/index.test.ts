@@ -53,8 +53,8 @@ describe('with split link', () => {
 
     test('handles subscriptions properly', async () => {
       const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
-        yield await new Promise(resolve => setTimeout(() => resolve({id, name: 'Toto'}), 1000));
+        const id = opts.input
+        yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: 'Toto' }), 1000))
       })
 
       server.use(subscription)
@@ -72,10 +72,10 @@ describe('with split link', () => {
 
     test('can receive multiple subscription updates', async () => {
       const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
+        const id = opts.input
         const names = ['Toto', 'Tutu', 'Titi']
         for (let i = 0; i < names.length; i++) {
-          yield await new Promise(resolve => setTimeout(() => resolve({id, name: names[i]!}), i * 50));
+          yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: names[i]! }), i * 50))
         }
       })
 
@@ -104,7 +104,7 @@ describe('with split link', () => {
 
     test('can trigger subscription data', async () => {
       const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-        yield await new Promise(resolve => setTimeout(() => resolve({id: opts.input, name: 'Didier'}), 1000));
+        yield await new Promise((resolve) => setTimeout(() => resolve({ id: opts.input, name: 'Didier' }), 1000))
       })
 
       server.use(subscription)
@@ -151,8 +151,8 @@ describe('with split link', () => {
 
     test('handles subscriptions properly', async () => {
       const subscription = mswTrpc.deeply.nested.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
-        yield await new Promise(resolve => setTimeout(() => resolve({id, name: 'Tutu'}), 1000));
+        const id = opts.input
+        yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: 'Tutu' }), 1000))
       })
 
       server.use(subscription)

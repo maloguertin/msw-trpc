@@ -5,7 +5,14 @@ import { render, screen, waitFor } from '@testing-library/react'
 import type { AppRouter } from './routers/basic.js'
 
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { createTRPCClient, httpLink as TRPCClientHttpLink, wsLink as TRPCClientWSLink, createWSClient as TRPCCreateWSClient, TRPCLink, splitLink as TRPCClientSplitLink} from '@trpc/client'
+import {
+  createTRPCClient,
+  httpLink as TRPCClientHttpLink,
+  wsLink as TRPCClientWSLink,
+  createWSClient as TRPCCreateWSClient,
+  TRPCLink,
+  splitLink as TRPCClientSplitLink,
+} from '@trpc/client'
 import { createTRPCOptionsProxy, useSubscription } from '@trpc/tanstack-react-query'
 import { useState } from 'react'
 
@@ -152,9 +159,8 @@ describe('basic', () => {
 
       useSubscription(
         trpc.getUserUpdates.subscriptionOptions('1', {
-            onData: (data) => setData(data),
-          }
-        )
+          onData: (data) => setData(data),
+        })
       )
 
       if (data) {
@@ -175,7 +181,7 @@ describe('basic', () => {
     })
 
     const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-      yield await new Promise(resolve => setTimeout(() => resolve({id: opts.input, name: 'Didier'}), 500));
+      yield await new Promise((resolve) => setTimeout(() => resolve({ id: opts.input, name: 'Didier' }), 500))
     })
 
     server.use(subscription)
@@ -225,9 +231,8 @@ describe('basic', () => {
 
       useSubscription(
         trpc.getUserUpdates.subscriptionOptions('1', {
-            onData: (data) => setRecord(data),
-          }
-        )
+          onData: (data) => setRecord(data),
+        })
       )
 
       const [record, setRecord] = useState<{
@@ -265,7 +270,7 @@ describe('basic', () => {
     })
 
     const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-      yield await new Promise(resolve => setTimeout(() => resolve({id: opts.input, name: 'Didier'}), 500));
+      yield await new Promise((resolve) => setTimeout(() => resolve({ id: opts.input, name: 'Didier' }), 500))
     })
 
     server.use(

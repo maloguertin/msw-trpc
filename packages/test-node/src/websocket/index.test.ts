@@ -37,10 +37,12 @@ describe('with ws link', () => {
     })
 
     test('handles mutations properly', async () => {
-      server.use(mswTrpc.createUser.mutation(({ input }) => {
-        console.log('Creating user:', input)
-        return { id: '2', name: input }
-      }))
+      server.use(
+        mswTrpc.createUser.mutation(({ input }) => {
+          console.log('Creating user:', input)
+          return { id: '2', name: input }
+        })
+      )
 
       const trpc = createTRPCClient<AppRouter>({ links: createLinks() })
       const user = await trpc.createUser.mutate('Robert')
@@ -50,8 +52,8 @@ describe('with ws link', () => {
 
     test('handles subscriptions properly', async () => {
       const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
-        yield await new Promise(resolve => setTimeout(() => resolve({id, name: 'Toto'}), 1000));
+        const id = opts.input
+        yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: 'Toto' }), 1000))
       })
 
       server.use(subscription)
@@ -69,10 +71,10 @@ describe('with ws link', () => {
 
     test('can receive multiple subscription updates', async () => {
       const subscription = mswTrpc.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
+        const id = opts.input
         const names = ['Toto', 'Tutu', 'Titi']
         for (let i = 0; i < names.length; i++) {
-          yield await new Promise(resolve => setTimeout(() => resolve({id, name: names[i]!}), i * 50));
+          yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: names[i]! }), i * 50))
         }
       })
 
@@ -125,8 +127,8 @@ describe('with ws link', () => {
 
     test('handles subscriptions properly', async () => {
       const subscription = mswTrpc.deeply.nested.getUserUpdates.subscription(async function* (opts) {
-        const id = opts.input;
-        yield await new Promise(resolve => setTimeout(() => resolve({id, name: 'Tutu'}), 1000));
+        const id = opts.input
+        yield await new Promise((resolve) => setTimeout(() => resolve({ id, name: 'Tutu' }), 1000))
       })
 
       server.use(subscription)

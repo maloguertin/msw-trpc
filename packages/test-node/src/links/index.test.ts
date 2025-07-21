@@ -1,4 +1,4 @@
-import EventEmitter, { on } from 'events';
+import EventEmitter, { on } from 'events'
 import { HttpHandler, WebSocketHandler } from 'msw'
 import { describe, test, expect } from 'vitest'
 
@@ -42,15 +42,15 @@ describe('building handlers based on trpc links', () => {
         client: createWSClient({
           url: 'ws://localhost:3001/trpc',
         }),
-      })
+      }),
     ]
 
     test('should intercept ws handler', async () => {
       const mswTrpc = createTRPCMsw<AppRouter>({ links: mswLinks })
 
       const myAsyncGenerator = async function* (opts: { input: string; signal?: AbortSignal }) {
-          yield { id: opts.input, name: 'Toto' }
-        };
+        yield { id: opts.input, name: 'Toto' }
+      }
 
       typeof myAsyncGenerator
 
@@ -66,7 +66,9 @@ describe('building handlers based on trpc links', () => {
     test('should intercept ws handler with nested routers', async () => {
       const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ links: mswLinks })
 
-      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(WebSocketHandler)
+      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(
+        WebSocketHandler
+      )
       expect(nestedMswTrpc.deeply.nested.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(
         WebSocketHandler
       )
@@ -111,9 +113,7 @@ describe('with split link', () => {
     test('should use correct handler with nested routers', async () => {
       const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ links: mswLinks })
 
-      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(
-        HttpHandler
-      )
+      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(HttpHandler)
       expect(nestedMswTrpc.deeply.nested.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(
         HttpHandler
       )
@@ -153,7 +153,7 @@ describe('with split link', () => {
       expect(mswTrpc.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(WebSocketHandler)
       expect(
         mswTrpc.getUserUpdates.subscription(async function* (opts) {
-          yield { id: opts.input, name: 'Toto' };
+          yield { id: opts.input, name: 'Toto' }
         })
       ).toBeInstanceOf(WebSocketHandler)
     })
@@ -181,9 +181,7 @@ describe('with split link', () => {
 
       const nestedMswTrpc = createTRPCMsw<NestedAppRouter>({ links: mswLinks })
 
-      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(
-        HttpHandler
-      )
+      expect(nestedMswTrpc.deeply.nested.userById.query(() => ({ id: '1', name: 'Malo' }))).toBeInstanceOf(HttpHandler)
       expect(nestedMswTrpc.deeply.nested.createUser.mutation(({ input }) => ({ id: '2', name: input }))).toBeInstanceOf(
         WebSocketHandler
       )
@@ -195,4 +193,3 @@ describe('with split link', () => {
     })
   })
 })
-

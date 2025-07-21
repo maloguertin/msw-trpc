@@ -43,16 +43,20 @@ export type ProcedureHandlerRecord<TRouter extends AnyTRPCRouter, TRecord extend
             }
           : $Value['_def']['type'] extends 'subscription'
             ? {
-              subscription: (
-                handler?: ({
-                  input,
-                  signal,
-                }: {
-                  input: inferProcedureInput<$Value>,
-                  signal: AbortSignal | undefined,
-                }) => AsyncIterable<inferAsyncIterableYield<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>, void, unknown>
-              ) => WebSocketHandler
-            }
+                subscription: (
+                  handler?: ({
+                    input,
+                    signal,
+                  }: {
+                    input: inferProcedureInput<$Value>
+                    signal: AbortSignal | undefined
+                  }) => AsyncIterable<
+                    inferAsyncIterableYield<inferTransformedProcedureOutputOrVoid<TRouter, $Value>>,
+                    void,
+                    unknown
+                  >
+                ) => WebSocketHandler
+              }
             : never
         : never
     : never

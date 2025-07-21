@@ -35,4 +35,3 @@ export const createTRPCMsw = <Router extends AnyTRPCRouter>(config: TRPCMswConfi
 
   return createUntypedTRPCMsw() as MswTrpc<Router>
 }
-

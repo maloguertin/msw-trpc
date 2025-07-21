@@ -43,6 +43,15 @@ const appRouter = t.router({
         name: input,
       } as User
     }),
+  getUserUpdates: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .subscription(async function* (opts) {
+      yield { id: opts.input, name: 'Marie' } as User
+    }),
 })
 
 export type AppRouteWithSuperJson = typeof appRouter

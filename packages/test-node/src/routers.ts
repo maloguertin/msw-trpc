@@ -45,6 +45,15 @@ const appRouter = t.router({
   deleteAllUsers: t.procedure.mutation(() => {
     return true
   }),
+  getUserUpdates: t.procedure
+    .input((val: unknown) => {
+      if (typeof val === 'string') return val
+
+      throw new Error(`Invalid input: ${typeof val}`)
+    })
+    .subscription(async function* (opts) {
+      yield { id: opts.input, name: 'Marie' } as User
+    }),
 })
 
 const nestedRouter = t.router({ deeply: { nested: appRouter } })

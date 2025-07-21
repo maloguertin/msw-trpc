@@ -1,4 +1,3 @@
-import EventEmitter, { on } from 'events'
 import { HttpHandler, WebSocketHandler } from 'msw'
 import { describe, test, expect } from 'vitest'
 
